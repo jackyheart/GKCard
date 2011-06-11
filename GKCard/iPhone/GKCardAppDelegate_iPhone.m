@@ -7,11 +7,23 @@
 //
 
 #import "GKCardAppDelegate_iPhone.h"
+#import "GKCardAppDelegate_iPhone.h"
 
 @implementation GKCardAppDelegate_iPhone
+@synthesize viewController;
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
+{
+    // Override point for customization after application launch.
+    self.window.rootViewController = (UIViewController *)viewController;
+    
+    return YES;
+}
+
 
 - (void)dealloc
 {
+    [viewController release];
 	[super dealloc];
 }
 

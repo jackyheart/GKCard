@@ -9,8 +9,12 @@
 #import <UIKit/UIKit.h>
 #import "GKCardAppDelegate.h"
 
+@class GKCardViewController_iPhone;
+
 @interface GKCardAppDelegate_iPhone : GKCardAppDelegate {
     
 }
+
+@property (nonatomic, retain) IBOutlet GKCardViewController_iPhone *viewController;
 
 @end
