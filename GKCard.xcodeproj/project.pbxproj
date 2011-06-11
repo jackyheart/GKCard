@@ -1,0 +1,307 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		CD9E40D813A33B9300256BFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D713A33B9300256BFF /* UIKit.framework */; };
+		CD9E40DA13A33B9300256BFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D913A33B9300256BFF /* Foundation.framework */; };
+		CD9E40DC13A33B9300256BFF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40DB13A33B9300256BFF /* CoreGraphics.framework */; };
+		CD9E40E213A33B9300256BFF /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = CD9E40E013A33B9300256BFF /* InfoPlist.strings */; };
+		CD9E40E513A33B9300256BFF /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = CD9E40E413A33B9300256BFF /* main.m */; };
+		CD9E40E813A33B9300256BFF /* GKCardAppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = CD9E40E713A33B9300256BFF /* GKCardAppDelegate.m */; };
+		CD9E40EC13A33B9300256BFF /* GKCardAppDelegate_iPhone.m in Sources */ = {isa = PBXBuildFile; fileRef = CD9E40EB13A33B9300256BFF /* GKCardAppDelegate_iPhone.m */; };
+		CD9E40EF13A33B9300256BFF /* MainWindow_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD9E40ED13A33B9300256BFF /* MainWindow_iPhone.xib */; };
+		CD9E40F313A33B9300256BFF /* GKCardAppDelegate_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = CD9E40F213A33B9300256BFF /* GKCardAppDelegate_iPad.m */; };
+		CD9E40F613A33B9300256BFF /* MainWindow_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD9E40F413A33B9300256BFF /* MainWindow_iPad.xib */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		CD9E40D313A33B9300256BFF /* GKCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GKCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		CD9E40D713A33B9300256BFF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
+		CD9E40D913A33B9300256BFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		CD9E40DB13A33B9300256BFF /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
+		CD9E40DF13A33B9300256BFF /* GKCard-Info.plist */ = {isa = PBXFileReference; path = "GKCard-Info.plist"; sourceTree = "<group>"; };
+		CD9E40E113A33B9300256BFF /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/InfoPlist.strings; sourceTree = "<group>"; };
+		CD9E40E313A33B9300256BFF /* GKCard-Prefix.pch */ = {isa = PBXFileReference; path = "GKCard-Prefix.pch"; sourceTree = "<group>"; };
+		CD9E40E413A33B9300256BFF /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		CD9E40E613A33B9300256BFF /* GKCardAppDelegate.h */ = {isa = PBXFileReference; path = GKCardAppDelegate.h; sourceTree = "<group>"; };
+		CD9E40E713A33B9300256BFF /* GKCardAppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = GKCardAppDelegate.m; sourceTree = "<group>"; };
+		CD9E40EA13A33B9300256BFF /* GKCardAppDelegate_iPhone.h */ = {isa = PBXFileReference; name = GKCardAppDelegate_iPhone.h; path = iPhone/GKCardAppDelegate_iPhone.h; sourceTree = "<group>"; };
+		CD9E40EB13A33B9300256BFF /* GKCardAppDelegate_iPhone.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GKCardAppDelegate_iPhone.m; path = iPhone/GKCardAppDelegate_iPhone.m; sourceTree = "<group>"; };
+		CD9E40EE13A33B9300256BFF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPhone/en.lproj/MainWindow_iPhone.xib; sourceTree = "<group>"; };
+		CD9E40F113A33B9300256BFF /* GKCardAppDelegate_iPad.h */ = {isa = PBXFileReference; name = GKCardAppDelegate_iPad.h; path = iPad/GKCardAppDelegate_iPad.h; sourceTree = "<group>"; };
+		CD9E40F213A33B9300256BFF /* GKCardAppDelegate_iPad.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = GKCardAppDelegate_iPad.m; path = iPad/GKCardAppDelegate_iPad.m; sourceTree = "<group>"; };
+		CD9E40F513A33B9300256BFF /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = iPad/en.lproj/MainWindow_iPad.xib; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		CD9E40D013A33B9300256BFF /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD9E40D813A33B9300256BFF /* UIKit.framework in Frameworks */,
+				CD9E40DA13A33B9300256BFF /* Foundation.framework in Frameworks */,
+				CD9E40DC13A33B9300256BFF /* CoreGraphics.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		CD9E40C813A33B9300256BFF = {
+			isa = PBXGroup;
+			children = (
+				CD9E40DD13A33B9300256BFF /* GKCard */,
+				CD9E40D613A33B9300256BFF /* Frameworks */,
+				CD9E40D413A33B9300256BFF /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		CD9E40D413A33B9300256BFF /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40D313A33B9300256BFF /* GKCard.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		CD9E40D613A33B9300256BFF /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40D713A33B9300256BFF /* UIKit.framework */,
+				CD9E40D913A33B9300256BFF /* Foundation.framework */,
+				CD9E40DB13A33B9300256BFF /* CoreGraphics.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		CD9E40DD13A33B9300256BFF /* GKCard */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40E613A33B9300256BFF /* GKCardAppDelegate.h */,
+				CD9E40E713A33B9300256BFF /* GKCardAppDelegate.m */,
+				CD9E40E913A33B9300256BFF /* iPhone */,
+				CD9E40F013A33B9300256BFF /* iPad */,
+				CD9E40DE13A33B9300256BFF /* Supporting Files */,
+			);
+			path = GKCard;
+			sourceTree = "<group>";
+		};
+		CD9E40DE13A33B9300256BFF /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40DF13A33B9300256BFF /* GKCard-Info.plist */,
+				CD9E40E013A33B9300256BFF /* InfoPlist.strings */,
+				CD9E40E313A33B9300256BFF /* GKCard-Prefix.pch */,
+				CD9E40E413A33B9300256BFF /* main.m */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CD9E40E913A33B9300256BFF /* iPhone */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40EA13A33B9300256BFF /* GKCardAppDelegate_iPhone.h */,
+				CD9E40EB13A33B9300256BFF /* GKCardAppDelegate_iPhone.m */,
+				CD9E40ED13A33B9300256BFF /* MainWindow_iPhone.xib */,
+			);
+			name = iPhone;
+			sourceTree = "<group>";
+		};
+		CD9E40F013A33B9300256BFF /* iPad */ = {
+			isa = PBXGroup;
+			children = (
+				CD9E40F113A33B9300256BFF /* GKCardAppDelegate_iPad.h */,
+				CD9E40F213A33B9300256BFF /* GKCardAppDelegate_iPad.m */,
+				CD9E40F413A33B9300256BFF /* MainWindow_iPad.xib */,
+			);
+			name = iPad;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		CD9E40D213A33B9300256BFF /* GKCard */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CD9E40F913A33B9300256BFF /* Build configuration list for PBXNativeTarget "GKCard" */;
+			buildPhases = (
+				CD9E40CF13A33B9300256BFF /* Sources */,
+				CD9E40D013A33B9300256BFF /* Frameworks */,
+				CD9E40D113A33B9300256BFF /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = GKCard;
+			productName = GKCard;
+			productReference = CD9E40D313A33B9300256BFF /* GKCard.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		CD9E40CA13A33B9300256BFF /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = CD9E40CD13A33B9300256BFF /* Build configuration list for PBXProject "GKCard" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = CD9E40C813A33B9300256BFF;
+			productRefGroup = CD9E40D413A33B9300256BFF /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				CD9E40D213A33B9300256BFF /* GKCard */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		CD9E40D113A33B9300256BFF /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD9E40E213A33B9300256BFF /* InfoPlist.strings in Resources */,
+				CD9E40EF13A33B9300256BFF /* MainWindow_iPhone.xib in Resources */,
+				CD9E40F613A33B9300256BFF /* MainWindow_iPad.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		CD9E40CF13A33B9300256BFF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CD9E40E513A33B9300256BFF /* main.m in Sources */,
+				CD9E40E813A33B9300256BFF /* GKCardAppDelegate.m in Sources */,
+				CD9E40EC13A33B9300256BFF /* GKCardAppDelegate_iPhone.m in Sources */,
+				CD9E40F313A33B9300256BFF /* GKCardAppDelegate_iPad.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXVariantGroup section */
+		CD9E40E013A33B9300256BFF /* InfoPlist.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CD9E40E113A33B9300256BFF /* en */,
+			);
+			name = InfoPlist.strings;
+			sourceTree = "<group>";
+		};
+		CD9E40ED13A33B9300256BFF /* MainWindow_iPhone.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CD9E40EE13A33B9300256BFF /* en */,
+			);
+			name = MainWindow_iPhone.xib;
+			sourceTree = "<group>";
+		};
+		CD9E40F413A33B9300256BFF /* MainWindow_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				CD9E40F513A33B9300256BFF /* en */,
+			);
+			name = MainWindow_iPad.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		CD9E40F713A33B9300256BFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		CD9E40F813A33B9300256BFF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		CD9E40FA13A33B9300256BFF /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GKCard/GKCard-Prefix.pch";
+				INFOPLIST_FILE = "GKCard/GKCard-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Debug;
+		};
+		CD9E40FB13A33B9300256BFF /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				COPY_PHASE_STRIP = YES;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "GKCard/GKCard-Prefix.pch";
+				INFOPLIST_FILE = "GKCard/GKCard-Info.plist";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				VALIDATE_PRODUCT = YES;
+				WRAPPER_EXTENSION = app;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		CD9E40CD13A33B9300256BFF /* Build configuration list for PBXProject "GKCard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD9E40F713A33B9300256BFF /* Debug */,
+				CD9E40F813A33B9300256BFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CD9E40F913A33B9300256BFF /* Build configuration list for PBXNativeTarget "GKCard" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CD9E40FA13A33B9300256BFF /* Debug */,
+				CD9E40FB13A33B9300256BFF /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = CD9E40CA13A33B9300256BFF /* Project object */;
+}
