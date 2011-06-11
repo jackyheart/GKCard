@@ -77,7 +77,9 @@
         
         UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
         UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
-        curCardImgView.frame = CGRectMake(0, 0, self.cardContainerView.frame.size.width, self.cardContainerView.frame.size.height);
+        curCardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+        
+        curCardImgView.frame = CGRectMake(67.0, 15.0, 187.0, 261.0);
         
         [self.cardDeckImgViewMutArray addObject:curCardImgView];
         [self.cardContainerView addSubview:curCardImgView];
@@ -156,20 +158,33 @@
 #pragma mark - App logic
 
 - (IBAction)flipBtnPressed
-{
-    /*
-    [UIView transitionFromView:self.cardImgView toView:self.cardBacksideImgView duration:1.0 options:UIViewAnimationTransitionFlipFromRight completion:^(BOOL finished) { }];
-     */
-    
+{   
     int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
     
     if(IS_FACING_FRONT)
     {
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+        
+        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        {
+            UIImage *backsideImage = [UIImage imageNamed:@"backside.jpg"];
+            
+            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            curCardImgView.image = backsideImage;
+        }    
     }
     else 
     {
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+        
+        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        {
+            NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
+            UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
+            
+            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            curCardImgView.image = curCardImage;
+        }    
     }
     
     
@@ -194,7 +209,9 @@
                         }
                     }
      
-                    completion:NULL];   
+                    completion:^(BOOL finished) {
+                        
+                    }];
 }
 
 - (void)swipeOpenCards
@@ -202,7 +219,7 @@
     float middleIndexDecimal = [self.cardDeckImgViewMutArray count] / 2;
     float middleIndexRounded = roundf(middleIndexDecimal);
     
-    float BASE_INCR = 15.0;
+    float BASE_INCR = 5.0;
     float BASE_START = -(BASE_INCR) * middleIndexRounded;//increment of 15 degrees * number of cards (converted index)
     int middleIndexInteger = (int)middleIndexRounded;
     
@@ -219,9 +236,7 @@
         for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
         {
             UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
-            curCardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
-            
-            NSLog(@"i:%d, BASE_START angle: %f", i, BASE_START);
+        
             curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(BASE_START));
             
             if(! PAST_MIDDLE)
