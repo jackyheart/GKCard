@@ -6,15 +6,19 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "GKCardViewController_iPhone.h"
 #define RADIANS( degrees ) ( degrees * M_PI / 180 )
 
 @implementation GKCardViewController_iPhone
 
+@synthesize numCardsLabel;
 @synthesize cardContainerView;
 @synthesize cardImgView;
 @synthesize cardBacksideImgView;
 @synthesize swipeAreaView;
+@synthesize cardDictMutArray;
+@synthesize cardDeckImgViewMutArray;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,10 +31,13 @@
 
 - (void)dealloc
 {
+    [numCardsLabel release];
     [cardContainerView release];
     [cardImgView release];
     [cardBacksideImgView release];
     [swipeAreaView release];
+    [cardDictMutArray release];
+    [cardDeckImgViewMutArray release];
     
     [super dealloc];
 }
@@ -49,6 +56,38 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    //=== init mutable array
+    self.cardDictMutArray = [NSMutableArray array];
+    self.cardDeckImgViewMutArray = [NSMutableArray array];
+    
+    //=== load card dictionary
+    NSString *path = [[NSBundle mainBundle] pathForResource:@"CardDeckList" ofType:@"plist"];
+    NSDictionary *dict = [[NSDictionary alloc] initWithContentsOfFile:path];
+    
+    self.cardDictMutArray = [dict objectForKey:@"Card"];
+    
+    [dict release];
+    
+    
+    //=== populate card array
+    for(int i=0; i < [self.cardDictMutArray count]; i++)
+    {
+        NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
+        
+        UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
+        UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
+        curCardImgView.frame = CGRectMake(0, 0, self.cardContainerView.frame.size.width, self.cardContainerView.frame.size.height);
+        
+        [self.cardDeckImgViewMutArray addObject:curCardImgView];
+        [self.cardContainerView addSubview:curCardImgView];
+        
+        [curCardImgView release];
+    }
+    
+    
+    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardDeckImgViewMutArray count]];
+    
     
     //=== swipe gesture
     UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
@@ -86,19 +125,27 @@
 
 - (void)swipeGestureHandler:(UISwipeGestureRecognizer *)recognizer {
 
-    
     //CGPoint location = [recognizer locationInView:self.view];
-    
-    
-    //NSLog(@"Swipe left started at (%f,%f)",location.x,location.y);
-    
+
     if(recognizer.direction == UISwipeGestureRecognizerDirectionLeft)
     {
         NSLog(@"left swipe detected");
+        
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            [self swipeOpenCards];
+            
+        } completion:NULL];
     }
     else if(recognizer.direction == UISwipeGestureRecognizerDirectionRight)
     {
         NSLog(@"right swipe detected");
+        
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            [self swipeCloseCards];
+            
+        } completion:NULL];    
     }
     else
     {
@@ -127,7 +174,7 @@
     
     
     [UIView transitionWithView:self.cardContainerView
-                      duration:1.0
+                      duration:0.8
                        options:animationOptionIdx
                     animations:^{ 
                         
@@ -148,6 +195,64 @@
                     }
      
                     completion:NULL];   
+}
+
+- (void)swipeOpenCards
+{
+    float middleIndexDecimal = [self.cardDeckImgViewMutArray count] / 2;
+    float middleIndexRounded = roundf(middleIndexDecimal);
+    
+    float BASE_INCR = 15.0;
+    float BASE_START = -(BASE_INCR) * middleIndexRounded;//increment of 15 degrees * number of cards (converted index)
+    int middleIndexInteger = (int)middleIndexRounded;
+    
+    //NSLog(@"middleIndexRounded: %f", middleIndexRounded);
+    //NSLog(@"middleIndexInteger: %d", middleIndexInteger);
+    
+    BOOL IS_EVEN = !([self.cardDeckImgViewMutArray count] % 2);
+    BOOL PAST_MIDDLE = FALSE;
+    
+    NSLog(@"IS_EVEN: %d", IS_EVEN);
+        
+    if([self.cardDeckImgViewMutArray count] > 1)
+    {
+        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        {
+            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            curCardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+            
+            NSLog(@"i:%d, BASE_START angle: %f", i, BASE_START);
+            curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(BASE_START));
+            
+            if(! PAST_MIDDLE)
+            {                
+                if((i + 1) >= middleIndexInteger)
+                {
+                    PAST_MIDDLE = TRUE;
+                    
+                    if(IS_EVEN)
+                    {
+                        //past the middle position, set the BASE_START to 0
+                        BASE_START = 0;
+                    }     
+                }
+            }
+
+            
+            BASE_START += BASE_INCR;
+        }
+    }
+    
+}
+
+- (void)swipeCloseCards
+{
+    for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+        
+        curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(0));
+    }       
 }
 
 @end
