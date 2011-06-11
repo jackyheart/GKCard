@@ -7,12 +7,14 @@
 //
 
 #import "GKCardViewController_iPhone.h"
-
+#define RADIANS( degrees ) ( degrees * M_PI / 180 )
 
 @implementation GKCardViewController_iPhone
 
+@synthesize cardContainerView;
 @synthesize cardImgView;
 @synthesize cardBacksideImgView;
+@synthesize swipeAreaView;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -25,8 +27,10 @@
 
 - (void)dealloc
 {
+    [cardContainerView release];
     [cardImgView release];
     [cardBacksideImgView release];
+    [swipeAreaView release];
     
     [super dealloc];
 }
@@ -45,6 +49,26 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    //=== swipe gesture
+    UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
+    
+    swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
+    [self.swipeAreaView addGestureRecognizer:swipeLeftGesture];
+    
+    [swipeLeftGesture release];
+    
+    
+    UISwipeGestureRecognizer *swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
+    
+    swipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
+    [self.swipeAreaView addGestureRecognizer:swipeRightGesture];
+    
+    [swipeRightGesture release];    
+    
+    
+    //=== set variables
+    IS_FACING_FRONT = YES;
 }
 
 - (void)viewDidUnload
@@ -60,6 +84,28 @@
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
 }
 
+- (void)swipeGestureHandler:(UISwipeGestureRecognizer *)recognizer {
+
+    
+    //CGPoint location = [recognizer locationInView:self.view];
+    
+    
+    //NSLog(@"Swipe left started at (%f,%f)",location.x,location.y);
+    
+    if(recognizer.direction == UISwipeGestureRecognizerDirectionLeft)
+    {
+        NSLog(@"left swipe detected");
+    }
+    else if(recognizer.direction == UISwipeGestureRecognizerDirectionRight)
+    {
+        NSLog(@"right swipe detected");
+    }
+    else
+    {
+        NSLog(@"other direction detected");
+    }
+}
+
 #pragma mark - App logic
 
 - (IBAction)flipBtnPressed
@@ -68,13 +114,37 @@
     [UIView transitionFromView:self.cardImgView toView:self.cardBacksideImgView duration:1.0 options:UIViewAnimationTransitionFlipFromRight completion:^(BOOL finished) { }];
      */
     
-    [UIView transitionWithView:self.cardImgView
-                      duration:0.5
-                       options:UIViewAnimationOptionTransitionFlipFromLeft
+    int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    
+    if(IS_FACING_FRONT)
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    }
+    else 
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+    }
+    
+    
+    [UIView transitionWithView:self.cardContainerView
+                      duration:1.0
+                       options:animationOptionIdx
                     animations:^{ 
                         
-                        [self.cardImgView removeFromSuperview]; 
-                        [self.view addSubview:self.cardBacksideImgView]; 
+                        if(IS_FACING_FRONT)
+                        {
+                            IS_FACING_FRONT = FALSE;
+                            
+                            [self.cardImgView removeFromSuperview]; 
+                            [self.cardContainerView addSubview:self.cardBacksideImgView]; 
+                        }
+                        else
+                        {
+                            IS_FACING_FRONT = TRUE;
+                            
+                            [self.cardBacksideImgView removeFromSuperview]; 
+                            [self.cardContainerView addSubview:self.cardImgView];                             
+                        }
                     }
      
                     completion:NULL];   
