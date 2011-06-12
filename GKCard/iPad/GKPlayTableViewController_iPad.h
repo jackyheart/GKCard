@@ -7,12 +7,20 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
 
-
-@interface GKPlayTableViewController_iPad : UIViewController {
+@interface GKPlayTableViewController_iPad : UIViewController
+<GKSessionDelegate, GKPeerPickerControllerDelegate> {
     
+    //bluetooth
+    @private GKSession *currentSession;
+    @private GKPeerPickerController *picker;     
 }
 
+@property (nonatomic, retain) GKSession *currentSession;
+
+- (void)startBluetooth;
+- (void)sendCardToIPhoneWithIndex:(int)cardIdx;
 - (IBAction)disconnectBtnPressed:(id)sender;
 
 @end

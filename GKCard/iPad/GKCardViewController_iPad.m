@@ -73,6 +73,8 @@ GKCardAppDelegate *APP_DELEGATE;
 - (IBAction)startBtnPressed:(id)sender
 {
     [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIpadVC.view];
+    
+    //[self.gkTableIpadVC ];
 }
 
 - (IBAction)quitBtnPressed:(id)sender

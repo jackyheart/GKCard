@@ -20,7 +20,7 @@
     @private NSMutableArray *cardDeckImgViewMutArray;
     @private BOOL IS_FACING_FRONT;
         
-        //bluetooth
+    //bluetooth
     @private GKSession *currentSession;
     @private GKPeerPickerController *picker;    
 }
@@ -32,6 +32,8 @@
 @property (nonatomic, retain) NSMutableArray *cardDeckImgViewMutArray;
 @property (nonatomic, retain) GKSession *currentSession;
 
+- (void)startBluetooth;
+- (void)sendCardToIPadWithIndex:(int)cardIdx;
 - (void)swipeOpenCards;
 - (void)swipeCloseCards;
 - (IBAction)flipBtnPressed:(id)sender;

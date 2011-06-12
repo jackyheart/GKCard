@@ -11,6 +11,7 @@
 #import "GKPlayTableViewController_iPad.h"
 
 @implementation GKPlayTableViewController_iPad
+@synthesize currentSession;
 
 //private variables
 GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
@@ -26,6 +27,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 
 - (void)dealloc
 {
+    [currentSession release];
     [super dealloc];
 }
 
@@ -61,8 +63,82 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 	return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
 }
 
+#pragma mark - Bluetooth delegates
+- (void)peerPickerController:(GKPeerPickerController *)pk didConnectPeer:(NSString *)peerID toSession:(GKSession *)session
+{
+    self.currentSession = session;
+    self.currentSession.delegate = self;
+    [self.currentSession setDataReceiveHandler:self withContext:nil];
+    
+    picker.delegate = nil;
+    [picker dismiss];
+    [picker autorelease];
+}
+
+- (void)peerPickerControllerDidCancel:(GKPeerPickerController *)pk
+{
+    picker.delegate = nil;
+    [picker autorelease];
+}
+
+- (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
+{
+    switch (state) {
+        case GKPeerStateConnected:
+            NSLog(@"peer is connected");
+            break;
+        case GKPeerStateDisconnected:
+            NSLog(@"peer is DISconnected");
+            break;
+        case GKPeerStateAvailable:
+            NSLog(@"peer is available");
+            break;
+        case GKPeerStateUnavailable:
+            NSLog(@"peer is UNavailable");
+            break;
+            
+        default:
+            break;
+    }
+}
+
+#pragma mark - App logic
+
+- (void)startBluetooth
+{
+    picker = [[GKPeerPickerController alloc] init];
+    picker.delegate = self;
+    picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
+    
+    [picker show];   
+}
+
+- (void)sendCardToIPhoneWithIndex:(int)cardIdx
+{
+    if(self.currentSession)
+    {  
+        NSData *data;
+        
+        NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
+        data = [cardIdxStr dataUsingEncoding:NSASCIIStringEncoding];
+        
+        NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
+        
+        [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
+    }
+    else
+    {
+        NSLog(@"current BT session not available");
+    }    
+}
+
 - (IBAction)disconnectBtnPressed:(id)sender
 {
+    //disconnect bluetooth
+    [self.currentSession disconnectFromAllPeers];
+    [self.currentSession release];
+    currentSession = nil;
+    
     GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
     [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view];
 }
