@@ -29,6 +29,13 @@
 		CD9E411213A3523000256BFF /* backside.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CD9E411113A3523000256BFF /* backside.jpg */; };
 		CD9E411413A3648E00256BFF /* CardDeckList.plist in Resources */ = {isa = PBXBuildFile; fileRef = CD9E411313A3648E00256BFF /* CardDeckList.plist */; };
 		CD9E411613A36CFA00256BFF /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E411513A36CFA00256BFF /* QuartzCore.framework */; };
+		CDDBB4A913A45A8D006D1970 /* GameKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CDDBB4A813A45A8D006D1970 /* GameKit.framework */; };
+		CDDBB4AE13A465F7006D1970 /* GKPlayTableViewController_iPhone.m in Sources */ = {isa = PBXBuildFile; fileRef = CDDBB4AC13A465F7006D1970 /* GKPlayTableViewController_iPhone.m */; };
+		CDDBB4AF13A465F7006D1970 /* GKPlayTableViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4AD13A465F7006D1970 /* GKPlayTableViewController_iPhone.xib */; };
+		CDDBB4B313A4661C006D1970 /* GKPlayTableViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = CDDBB4B113A4661C006D1970 /* GKPlayTableViewController_iPad.m */; };
+		CDDBB4B413A4661C006D1970 /* GKPlayTableViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */; };
+		CDDBB4B713A46D0F006D1970 /* card_casino_bg.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */; };
+		CDDBB4B813A46D0F006D1970 /* poker_shiny.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -62,6 +69,15 @@
 		CD9E411113A3523000256BFF /* backside.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = backside.jpg; sourceTree = "<group>"; };
 		CD9E411313A3648E00256BFF /* CardDeckList.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = CardDeckList.plist; sourceTree = "<group>"; };
 		CD9E411513A36CFA00256BFF /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
+		CDDBB4A813A45A8D006D1970 /* GameKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = GameKit.framework; path = System/Library/Frameworks/GameKit.framework; sourceTree = SDKROOT; };
+		CDDBB4AB13A465F7006D1970 /* GKPlayTableViewController_iPhone.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GKPlayTableViewController_iPhone.h; path = iPhone/GKPlayTableViewController_iPhone.h; sourceTree = "<group>"; };
+		CDDBB4AC13A465F7006D1970 /* GKPlayTableViewController_iPhone.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GKPlayTableViewController_iPhone.m; path = iPhone/GKPlayTableViewController_iPhone.m; sourceTree = "<group>"; };
+		CDDBB4AD13A465F7006D1970 /* GKPlayTableViewController_iPhone.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GKPlayTableViewController_iPhone.xib; path = iPhone/GKPlayTableViewController_iPhone.xib; sourceTree = "<group>"; };
+		CDDBB4B013A4661C006D1970 /* GKPlayTableViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = GKPlayTableViewController_iPad.h; path = iPad/GKPlayTableViewController_iPad.h; sourceTree = "<group>"; };
+		CDDBB4B113A4661C006D1970 /* GKPlayTableViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = GKPlayTableViewController_iPad.m; path = iPad/GKPlayTableViewController_iPad.m; sourceTree = "<group>"; };
+		CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GKPlayTableViewController_iPad.xib; path = iPad/GKPlayTableViewController_iPad.xib; sourceTree = "<group>"; };
+		CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = card_casino_bg.jpg; sourceTree = "<group>"; };
+		CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = poker_shiny.jpg; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -69,6 +85,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CDDBB4A913A45A8D006D1970 /* GameKit.framework in Frameworks */,
 				CD9E411613A36CFA00256BFF /* QuartzCore.framework in Frameworks */,
 				CD9E40D813A33B9300256BFF /* UIKit.framework in Frameworks */,
 				CD9E40DA13A33B9300256BFF /* Foundation.framework in Frameworks */,
@@ -99,6 +116,7 @@
 		CD9E40D613A33B9300256BFF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CDDBB4A813A45A8D006D1970 /* GameKit.framework */,
 				CD9E411513A36CFA00256BFF /* QuartzCore.framework */,
 				CD9E40D713A33B9300256BFF /* UIKit.framework */,
 				CD9E40D913A33B9300256BFF /* Foundation.framework */,
@@ -141,6 +159,9 @@
 				CD9E40FC13A33C3F00256BFF /* GKCardViewController_iPhone.h */,
 				CD9E40FD13A33C3F00256BFF /* GKCardViewController_iPhone.m */,
 				CD9E40FE13A33C3F00256BFF /* GKCardViewController_iPhone.xib */,
+				CDDBB4AB13A465F7006D1970 /* GKPlayTableViewController_iPhone.h */,
+				CDDBB4AC13A465F7006D1970 /* GKPlayTableViewController_iPhone.m */,
+				CDDBB4AD13A465F7006D1970 /* GKPlayTableViewController_iPhone.xib */,
 			);
 			name = iPhone;
 			sourceTree = "<group>";
@@ -154,6 +175,9 @@
 				CD9E410113A33C7800256BFF /* GKCardViewController_iPad.h */,
 				CD9E410213A33C7800256BFF /* GKCardViewController_iPad.m */,
 				CD9E410313A33C7800256BFF /* GKCardViewController_iPad.xib */,
+				CDDBB4B013A4661C006D1970 /* GKPlayTableViewController_iPad.h */,
+				CDDBB4B113A4661C006D1970 /* GKPlayTableViewController_iPad.m */,
+				CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */,
 			);
 			name = iPad;
 			sourceTree = "<group>";
@@ -161,6 +185,8 @@
 		CD9E410613A34E4900256BFF /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */,
+				CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */,
 				CD9E411113A3523000256BFF /* backside.jpg */,
 				CD9E410713A34E4900256BFF /* 2_spades.png */,
 				CD9E410813A34E4900256BFF /* 9_club.png */,
@@ -230,6 +256,10 @@
 				CD9E411013A34E4900256BFF /* poker_table.jpg in Resources */,
 				CD9E411213A3523000256BFF /* backside.jpg in Resources */,
 				CD9E411413A3648E00256BFF /* CardDeckList.plist in Resources */,
+				CDDBB4AF13A465F7006D1970 /* GKPlayTableViewController_iPhone.xib in Resources */,
+				CDDBB4B413A4661C006D1970 /* GKPlayTableViewController_iPad.xib in Resources */,
+				CDDBB4B713A46D0F006D1970 /* card_casino_bg.jpg in Resources */,
+				CDDBB4B813A46D0F006D1970 /* poker_shiny.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -246,6 +276,8 @@
 				CD9E40F313A33B9300256BFF /* GKCardAppDelegate_iPad.m in Sources */,
 				CD9E40FF13A33C3F00256BFF /* GKCardViewController_iPhone.m in Sources */,
 				CD9E410413A33C7800256BFF /* GKCardViewController_iPad.m in Sources */,
+				CDDBB4AE13A465F7006D1970 /* GKPlayTableViewController_iPhone.m in Sources */,
+				CDDBB4B313A4661C006D1970 /* GKPlayTableViewController_iPad.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -360,6 +392,7 @@
 				CD9E40FB13A33B9300256BFF /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};

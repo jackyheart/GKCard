@@ -7,33 +7,19 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <GameKit/GameKit.h>
 
+@class GKPlayTableViewController_iPhone;
 
-@interface GKCardViewController_iPhone : UIViewController {
- 
-    IBOutlet UILabel *numCardsLabel;
-    
-    IBOutlet UIView *cardContainerView;
-    IBOutlet UIImageView *cardImgView;
-    IBOutlet UIImageView *cardBacksideImgView;
-    
-    IBOutlet UIView *swipeAreaView;
-    
-    @private NSMutableArray *cardDictMutArray;
-    @private NSMutableArray *cardDeckImgViewMutArray;
-    @private BOOL IS_FACING_FRONT;
+@interface GKCardViewController_iPhone : UIViewController 
+{
+    @private GKPlayTableViewController_iPhone *gkTableIphoneVC;
 }
 
-@property (nonatomic, retain) UILabel *numCardsLabel;
-@property (nonatomic, retain) UIView *cardContainerView;
-@property (nonatomic, retain) UIImageView *cardImgView;
-@property (nonatomic, retain) UIImageView *cardBacksideImgView;
-@property (nonatomic, retain) UIView *swipeAreaView;
-@property (nonatomic, retain) NSMutableArray *cardDictMutArray;
-@property (nonatomic, retain) NSMutableArray *cardDeckImgViewMutArray;
+@property (nonatomic, retain) GKPlayTableViewController_iPhone *gkTableIphoneVC;
 
-- (IBAction)flipBtnPressed;
-- (void)swipeOpenCards;
-- (void)swipeCloseCards;
+- (IBAction)startBtnPressed:(id)sender;
+- (IBAction)quitBtnPressed:(id)sender;
+
 
 @end

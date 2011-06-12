@@ -6,10 +6,15 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import "GKCardAppDelegate.h"
 #import "GKCardViewController_iPad.h"
-
+#import "GKPlayTableViewController_iPad.h"
 
 @implementation GKCardViewController_iPad
+@synthesize gkTableIpadVC;
+
+//private variables
+GKCardAppDelegate *APP_DELEGATE;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -22,6 +27,8 @@
 
 - (void)dealloc
 {
+    [gkTableIpadVC release];
+    
     [super dealloc];
 }
 
@@ -39,6 +46,13 @@
 {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    
+    //=== get app delegate
+    APP_DELEGATE = [[UIApplication sharedApplication] delegate];   
+    
+    
+    //=== initialize view controllers
+    self.gkTableIpadVC = [[GKPlayTableViewController_iPad alloc] initWithNibName:@"GKPlayTableViewController_iPad" bundle:nil];
 }
 
 - (void)viewDidUnload
@@ -52,6 +66,18 @@
 {
     // Return YES for supported orientations
 	return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+}
+
+#pragma mark - Application logic
+
+- (IBAction)startBtnPressed:(id)sender
+{
+    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIpadVC.view];
+}
+
+- (IBAction)quitBtnPressed:(id)sender
+{
+    exit(0);
 }
 
 @end

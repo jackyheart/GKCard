@@ -1,20 +1,19 @@
 //
-//  GKCardViewController_iPhone.m
+//  GKPlayTableViewController_iPad.m
 //  GKCard
 //
-//  Created by sap_all\c5152815 on 6/11/11.
+//  Created by sap_all\c5152815 on 6/12/11.
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
-#import "GKCardAppDelegate.h"
-#import "GKCardViewController_iPhone.h"
-#import "GKPlayTableViewController_iPhone.h"
+#import "GKCardAppDelegate_iPad.h"
+#import "GKCardViewController_iPad.h"
+#import "GKPlayTableViewController_iPad.h"
 
-@implementation GKCardViewController_iPhone
-@synthesize gkTableIphoneVC;
+@implementation GKPlayTableViewController_iPad
 
 //private variables
-GKCardAppDelegate *APP_DELEGATE;
+GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -27,7 +26,6 @@ GKCardAppDelegate *APP_DELEGATE;
 
 - (void)dealloc
 {
-    [gkTableIphoneVC release];
     [super dealloc];
 }
 
@@ -47,11 +45,7 @@ GKCardAppDelegate *APP_DELEGATE;
     // Do any additional setup after loading the view from its nib.
     
     //=== get app delegate
-    APP_DELEGATE = [[UIApplication sharedApplication] delegate];
-    
-    //=== initialize view controllers
-    self.gkTableIphoneVC = [[GKPlayTableViewController_iPhone alloc]
-                            initWithNibName:@"GKPlayTableViewController_iPhone" bundle:nil];
+    APP_DELEGATE_IPAD = [[UIApplication sharedApplication] delegate];
 }
 
 - (void)viewDidUnload
@@ -64,20 +58,13 @@ GKCardAppDelegate *APP_DELEGATE;
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
     // Return YES for supported orientations
-    return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
 }
 
-#pragma mark - Application logic
-
-- (IBAction)startBtnPressed:(id)sender
+- (IBAction)disconnectBtnPressed:(id)sender
 {
-    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIphoneVC.view];
+    GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
+    [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view];
 }
-
-- (IBAction)quitBtnPressed:(id)sender
-{
-    exit(0);
-}
-
 
 @end

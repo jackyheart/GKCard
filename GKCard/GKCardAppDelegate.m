@@ -65,4 +65,18 @@
     [super dealloc];
 }
 
+#pragma mark - view transition
+
+-(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView
+{
+	[UIView beginAnimations:nil context:NULL];
+	[UIView setAnimationDuration:1.0];
+	[UIView setAnimationTransition:UIViewAnimationOptionTransitionFlipFromRight forView:self.window cache:YES];
+	[fromView removeFromSuperview];
+	[self.window addSubview:toView];
+	[UIView commitAnimations];
+    
+    NSLog(@"window num subviews: %d", [self.window.subviews count]);
+}
+
 @end

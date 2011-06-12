@@ -16,5 +16,6 @@
 }
 
 @property (nonatomic, retain) IBOutlet GKCardViewController_iPhone *viewController;
+//-(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView;
 
 @end
