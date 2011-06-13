@@ -84,53 +84,24 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
         UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
+        curCardImgView.userInteractionEnabled = YES;
         curCardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
-        
         curCardImgView.frame = CGRectMake(67.0, 15.0, 187.0, 261.0);
-        
-        //add to the array
-        [self.cardDeckImgViewMutArray addObject:curCardImgView];
-        [self.cardContainerView addSubview:curCardImgView];   
-        
-        [curCardImgView release];
-    }
+        curCardImgView.tag = i;//tag the card
     
-    
-    //==== testing only
-    
-    /*
-     for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
-     {
-     UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
-     
-     //gesture recognizer
-     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
-     
-     [curCardImgView addGestureRecognizer:panRecognizer]; 
-     
-     [panRecognizer release];
-     }
-     */
-    
-    for(UIImageView *curCardImgView in self.cardContainerView.subviews)
-    {
-        //gesture recognizer
+        //add gesture recognizer
         UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
         
         [curCardImgView addGestureRecognizer:panRecognizer]; 
         
-        [panRecognizer release];      
+        [panRecognizer release];    
+        
+        //add to the array
+        [self.cardDeckImgViewMutArray addObject:curCardImgView];
+        [self.cardContainerView addSubview:curCardImgView]; 
+    
+        [curCardImgView release];
     }
-    
-    
-    //UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
-    
-    //[self.swipeAreaView addGestureRecognizer:panRecognizer]; 
-    
-    //[panRecognizer release];
-    
-    //==== end testing only
-    
     
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardDeckImgViewMutArray count]];
     
@@ -208,11 +179,16 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     CGPoint translation = [recognizer translationInView:self.view];
     
+    if(recognizer.state == UIGestureRecognizerStateBegan)
+    {
+        CARD_INITIAL_TRANSFORM = recognizer.view.transform;
+    }
+    
     recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
     {
-        recognizer.view.transform = CGAffineTransformMakeTranslation(0.0, 0.0);
+        recognizer.view.transform = CARD_INITIAL_TRANSFORM;
     }
 }
 
@@ -265,11 +241,13 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (void)startBluetooth
 {
+    /*
     picker = [[GKPeerPickerController alloc] init];
     picker.delegate = self;
     picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
     
     [picker show];
+     */
 }
 
 - (void)sendCardToIPadWithIndex:(int)cardIdx 

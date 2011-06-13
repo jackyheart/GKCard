@@ -19,6 +19,8 @@
     @private NSMutableArray *cardDictMutArray;
     @private NSMutableArray *cardDeckImgViewMutArray;
     @private BOOL IS_FACING_FRONT;
+    
+    @private CGAffineTransform CARD_INITIAL_TRANSFORM;
         
     //bluetooth
     @private GKSession *currentSession;
