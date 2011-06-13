@@ -41,5 +41,4 @@
 - (IBAction)flipBtnPressed:(id)sender;
 - (IBAction)disconnectBtnPressed:(id)sender;
 
-
 @end

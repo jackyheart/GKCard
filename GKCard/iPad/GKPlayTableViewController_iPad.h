@@ -14,7 +14,7 @@
     
     @private NSMutableArray *cardDictMutArray;
     IBOutlet UILabel *numCardsLabel;
-    IBOutlet UIView *cardContainerView;
+    IBOutlet UIImageView *cardContainerImgView;
     IBOutlet UIView *swipeAreaView;
     
     //bluetooth
@@ -23,16 +23,19 @@
     
     @private int CUR_CARD_STACK_STATUS;
     @private CGPoint netTranslation;
+    
+    @private BOOL IS_CARD_CONTAINER_FACING_FRONT;
 }
 
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) UILabel *numCardsLabel;
-@property (nonatomic, retain) UIView *cardContainerView;
+@property (nonatomic, retain) UIImageView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
 @property (nonatomic, retain) GKSession *currentSession;
 
 - (void)startBluetooth;
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx;
 - (IBAction)disconnectBtnPressed:(id)sender;
+- (IBAction)flipBtnPressed:(id)sender;
 
 @end

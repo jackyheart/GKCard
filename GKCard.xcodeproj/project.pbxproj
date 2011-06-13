@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CD34B31913A65C0C00B2B254 /* iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = CD34B31813A65C0C00B2B254 /* iphone.png */; };
 		CD9E40D813A33B9300256BFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D713A33B9300256BFF /* UIKit.framework */; };
 		CD9E40DA13A33B9300256BFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D913A33B9300256BFF /* Foundation.framework */; };
 		CD9E40DC13A33B9300256BFF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40DB13A33B9300256BFF /* CoreGraphics.framework */; };
@@ -39,6 +40,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CD34B31813A65C0C00B2B254 /* iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iphone.png; sourceTree = "<group>"; };
 		CD9E40D313A33B9300256BFF /* GKCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GKCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD9E40D713A33B9300256BFF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		CD9E40D913A33B9300256BFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -185,6 +187,7 @@
 		CD9E410613A34E4900256BFF /* images */ = {
 			isa = PBXGroup;
 			children = (
+				CD34B31813A65C0C00B2B254 /* iphone.png */,
 				CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */,
 				CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */,
 				CD9E411113A3523000256BFF /* backside.jpg */,
@@ -260,6 +263,7 @@
 				CDDBB4B413A4661C006D1970 /* GKPlayTableViewController_iPad.xib in Resources */,
 				CDDBB4B713A46D0F006D1970 /* card_casino_bg.jpg in Resources */,
 				CDDBB4B813A46D0F006D1970 /* poker_shiny.jpg in Resources */,
+				CD34B31913A65C0C00B2B254 /* iphone.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

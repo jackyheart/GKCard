@@ -31,7 +31,7 @@ typedef enum {
 @implementation GKPlayTableViewController_iPad
 @synthesize cardDictMutArray;
 @synthesize numCardsLabel;
-@synthesize cardContainerView;
+@synthesize cardContainerImgView;
 @synthesize swipeAreaView;
 @synthesize currentSession;
 
@@ -51,7 +51,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 {
     [cardDictMutArray release];
     [numCardsLabel release];
-    [cardContainerView release];
+    [cardContainerImgView release];
     [swipeAreaView release];
     [currentSession release];
     [super dealloc];
@@ -95,7 +95,9 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         curCardImgView.userInteractionEnabled = YES;
         
         curCardImgView.frame = CGRectMake(0, 0, 187.0, 261.0);
-        curCardImgView.center = self.cardContainerView.center;
+        curCardImgView.center = CGPointMake(self.cardContainerImgView.frame.size.width * 0.5, 
+                                            self.cardContainerImgView.frame.size.height * 0.5);
+        
         curCardImgView.tag = i;//tag the card
     
         //add gesture recognizer
@@ -106,21 +108,24 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         [panRecognizer release];    
         
         //add to the array
-        [self.cardContainerView addSubview:curCardImgView]; 
+        [self.cardContainerImgView addSubview:curCardImgView]; 
         
         [curCardImgView release];
     } 
     
     //set number of cards label
-    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerView.subviews count]];
+    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
+    self.cardContainerImgView.userInteractionEnabled = YES;
+    self.cardContainerImgView.clipsToBounds = YES;
     
     //swipe gesture
+    
     //=== swipe gesture
     UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
      
     swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
    // swipeLeftGesture.numberOfTouchesRequired = 2;
-    [self.cardContainerView addGestureRecognizer:swipeLeftGesture];
+    [self.cardContainerImgView addGestureRecognizer:swipeLeftGesture];
     
     [swipeLeftGesture release];
     
@@ -129,13 +134,13 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     
     swipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
     //swipeRightGesture.numberOfTouchesRequired = 2;
-    [self.cardContainerView addGestureRecognizer:swipeRightGesture];
+    [self.cardContainerImgView addGestureRecognizer:swipeRightGesture];
     
     [swipeRightGesture release];     
     
-    
     //=== set variables
     CUR_CARD_STACK_STATUS = CARD_STACK_BALANCED;
+    IS_CARD_CONTAINER_FACING_FRONT = TRUE;
 }
 
 - (void)viewDidUnload
@@ -317,7 +322,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
          CUR_CARD_STACK_STATUS = CARD_EXPANDED_RIGHT;
     }
     
-    for(UIView *v in self.cardContainerView.subviews)
+    for(UIView *v in self.cardContainerImgView.subviews)
     {
         v.transform = CGAffineTransformMakeTranslation(separationVal * i, 0.0);
         
@@ -327,12 +332,65 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 
 - (void)swipeCloseCards
 {
-    for(UIView *v in self.cardContainerView.subviews)
+    for(UIView *v in self.cardContainerImgView.subviews)
     {
         v.transform = CGAffineTransformMakeTranslation(0.0, 0.0);
     }    
     
     CUR_CARD_STACK_STATUS = CARD_STACK_BALANCED;
+}
+
+- (IBAction)flipBtnPressed:(id)sender
+{
+    int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    
+    if(IS_CARD_CONTAINER_FACING_FRONT)
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+        
+        for(UIImageView *cardImgView in self.cardContainerImgView.subviews)
+        {
+            UIImage *backsideImage = [UIImage imageNamed:@"backside.jpg"];
+            
+            cardImgView.image = backsideImage;
+        }
+    }
+    else 
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+        
+        int i=0;
+        for(UIImageView *cardImgView in self.cardContainerImgView.subviews)
+        {
+            NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
+            UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
+            
+            cardImgView.image = curCardImage;
+            
+            i++;
+        }
+    }
+    
+    
+    [UIView transitionWithView:self.cardContainerImgView
+                      duration:0.8
+                       options:animationOptionIdx
+                    animations:^{ 
+
+                    }
+     
+                    completion:^(BOOL finished) {
+                        
+                        if(IS_CARD_CONTAINER_FACING_FRONT)
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
+                            
+                        }
+                        else
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
+                        }   
+                    }];    
 }
 
 @end
