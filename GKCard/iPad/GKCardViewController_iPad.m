@@ -72,9 +72,8 @@ GKCardAppDelegate *APP_DELEGATE;
 
 - (IBAction)startBtnPressed:(id)sender
 {
-    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIpadVC.view];
-    
-    //[self.gkTableIpadVC ];
+    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIpadVC.view withDirection:1];
+    //[self.gkTableIpadVC startBluetooth];
 }
 
 - (IBAction)quitBtnPressed:(id)sender

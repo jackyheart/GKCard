@@ -6,6 +6,7 @@
 //  Copyright 2011 __MyCompanyName__. All rights reserved.
 //
 
+#import <QuartzCore/QuartzCore.h>
 #import "GKCardAppDelegate.h"
 
 @implementation GKCardAppDelegate
@@ -67,14 +68,40 @@
 
 #pragma mark - view transition
 
--(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView
+-(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView withDirection:(int)dir
 {
+    /*
 	[UIView beginAnimations:nil context:NULL];
 	[UIView setAnimationDuration:1.0];
 	[UIView setAnimationTransition:UIViewAnimationOptionTransitionFlipFromRight forView:self.window cache:YES];
 	[fromView removeFromSuperview];
 	[self.window addSubview:toView];
 	[UIView commitAnimations];
+    
+     */
+    
+ 	CATransition *animation = [CATransition animation];
+	[animation setType:kCATransitionPush];
+    
+    if(dir == 0)
+    {
+        //slide from left
+        [animation setSubtype:kCATransitionFromLeft];
+    }
+    else if(dir == 1)
+    {
+        //slide from right
+        [animation setSubtype:kCATransitionFromRight];        
+    }
+    
+	[animation setDuration:0.5];
+	[animation setTimingFunction:[CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut]];
+	[[fromView.superview layer] addAnimation:animation forKey:nil];
+	
+	[fromView removeFromSuperview];
+	
+	[self.window addSubview:toView];
+     
     
     NSLog(@"window num subviews: %d", [self.window.subviews count]);
 }

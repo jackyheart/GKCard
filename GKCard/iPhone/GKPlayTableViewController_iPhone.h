@@ -8,36 +8,38 @@
 
 #import <UIKit/UIKit.h>
 #import <GameKit/GameKit.h>
+#import "SBJSON.h"
 
 @interface GKPlayTableViewController_iPhone : UIViewController
 <GKSessionDelegate, GKPeerPickerControllerDelegate> {
    
     IBOutlet UILabel *numCardsLabel;
-    IBOutlet UIView *cardContainerView;
+    IBOutlet UILabel *cardNameLabel;
+    IBOutlet UIImageView *cardContainerImgView;
     IBOutlet UIView *swipeAreaView;
     
     @private NSMutableArray *cardDictMutArray;
-    @private NSMutableArray *cardDeckImgViewMutArray;
     @private BOOL IS_FACING_FRONT;
     
     @private CGAffineTransform CARD_INITIAL_TRANSFORM;
         
     //bluetooth
     @private GKSession *currentSession;
-    @private GKPeerPickerController *picker;    
+    @private GKPeerPickerController *picker;
+    
+    //JSON
+    @private SBJSON *sbJSON;
 }
 
 @property (nonatomic, retain) UILabel *numCardsLabel;
-@property (nonatomic, retain) UIView *cardContainerView;
+@property (nonatomic, retain) UILabel *cardNameLabel;
+@property (nonatomic, retain) UIView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
-@property (nonatomic, retain) NSMutableArray *cardDeckImgViewMutArray;
 @property (nonatomic, retain) GKSession *currentSession;
+@property (nonatomic, retain) SBJSON *sbJSON;
 
 - (void)startBluetooth;
-- (void)sendCardToIPadWithIndex:(int)cardIdx;
-- (void)swipeOpenCards;
-- (void)swipeCloseCards;
 - (IBAction)flipBtnPressed:(id)sender;
 - (IBAction)disconnectBtnPressed:(id)sender;
 

@@ -10,16 +10,27 @@
 #import "GKCardAppDelegate_iPhone.h"
 #import "GKCardViewController_iPhone.h"
 #import "GKPlayTableViewController_iPhone.h"
+
 #define RADIANS( degrees ) ( degrees * M_PI / 180 )
+
+@interface GKPlayTableViewController_iPhone (private)
+
+- (void)sendCardToIPadWithIndex:(int)cardIdx;
+- (void)swipeOpenCards;
+- (void)swipeCloseCards;
+
+@end
+
 
 @implementation GKPlayTableViewController_iPhone
 
 @synthesize numCardsLabel;
-@synthesize cardContainerView;
+@synthesize cardNameLabel;
+@synthesize cardContainerImgView;
 @synthesize swipeAreaView;
 @synthesize cardDictMutArray;
-@synthesize cardDeckImgViewMutArray;
 @synthesize currentSession;
+@synthesize sbJSON;
 
 //private variables
 GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
@@ -36,11 +47,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 - (void)dealloc
 {
     [numCardsLabel release];
-    [cardContainerView release];
+    [cardNameLabel release];
+    [cardContainerImgView release];
     [swipeAreaView release];
     [cardDictMutArray release];
-    [cardDeckImgViewMutArray release];
     [currentSession release];
+    [sbJSON release];
     
     [super dealloc];
 }
@@ -63,10 +75,14 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     //=== get app delegate (iphone)
     APP_DELEGATE_IPHONE = [[UIApplication sharedApplication] delegate];
     
+    
+    //=== initialize SBJSON
+    self.sbJSON = [[SBJSON alloc] init];
+    self.sbJSON.humanReadable = YES;
+    
 
     //=== init mutable array
     self.cardDictMutArray = [NSMutableArray array];
-    self.cardDeckImgViewMutArray = [NSMutableArray array];
     
     //=== load card dictionary
     NSString *path = [[NSBundle mainBundle] pathForResource:@"CardDeckList" ofType:@"plist"];
@@ -78,7 +94,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     
     //=== populate card array
-    for(int i=0; i < [self.cardDictMutArray count]; i++)
+    for(int i=0; i < [self.cardDictMutArray count] - 2; i++)
     {
         NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
         
@@ -97,13 +113,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         [panRecognizer release];    
         
         //add to the array
-        [self.cardDeckImgViewMutArray addObject:curCardImgView];
-        [self.cardContainerView addSubview:curCardImgView]; 
+        [self.cardContainerImgView addSubview:curCardImgView]; 
     
         [curCardImgView release];
     }
     
-    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardDeckImgViewMutArray count]];
+    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
     
     
     //=== swipe gesture
@@ -236,32 +251,68 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
 }
 
+- (void) receiveData:(NSData *)data fromPeer:(NSString *)peer inSession: (GKSession *)session context:(void *)context
+{
+    NSString *dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    NSError *error;
+    NSDictionary *dataDictionary = [self.sbJSON objectWithString:dataStr error:&error];
+    
+    if(! dataDictionary)
+    {
+        NSLog(@"JSON parsing failed: %@", [error localizedDescription]);
+    }
+    else
+    {
+        NSLog(@"JSON parsing success");
+        
+        
+    }
+    
+    [dataStr release];    
+}
+
+
 
 #pragma mark - App logic
 
 - (void)startBluetooth
 {
-    /*
     picker = [[GKPeerPickerController alloc] init];
     picker.delegate = self;
     picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
     
     [picker show];
-     */
 }
 
 - (void)sendCardToIPadWithIndex:(int)cardIdx 
 {
     if(self.currentSession)
     {  
-        NSData *data;
+        //=== get card facing
+        //NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:cardIdx];
+        //NSString *cardFacing = [cardDict objectForKey:@"isFacingUp"];
         
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
-        data = [cardIdxStr dataUsingEncoding:NSASCIIStringEncoding];
         
-        NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
-    
-        [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
+        NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  cardIdxStr, @"cardIndex",
+                                  @"1", @"cardFacing", nil];   
+         
+        NSError *error;
+        NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
+        
+        if (! jsonString)
+        {
+            NSLog(@"JSON creation failed: %@", [error localizedDescription]);
+        }
+        else
+        {
+            NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+            NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
+            
+            [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
+        }
     }
     else
     {
@@ -271,26 +322,28 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (void)swipeOpenCards
 {
-    float middleIndexDecimal = [self.cardDeckImgViewMutArray count] / 2;
+    int CARD_COUNT = [self.cardContainerImgView.subviews count];
+    
+    float middleIndexDecimal = CARD_COUNT / 2;
     float middleIndexRounded = roundf(middleIndexDecimal);
     
-    float BASE_INCR = 5.0;
+    float BASE_INCR = 45.0;
     float BASE_START = -(BASE_INCR) * middleIndexRounded;//increment of 15 degrees * number of cards (converted index)
     int middleIndexInteger = (int)middleIndexRounded;
     
     //NSLog(@"middleIndexRounded: %f", middleIndexRounded);
     //NSLog(@"middleIndexInteger: %d", middleIndexInteger);
     
-    BOOL IS_EVEN = !([self.cardDeckImgViewMutArray count] % 2);
+    BOOL IS_EVEN = !(CARD_COUNT % 2);
     BOOL PAST_MIDDLE = FALSE;
     
     NSLog(@"IS_EVEN: %d", IS_EVEN);
     
-    if([self.cardDeckImgViewMutArray count] > 1)
+    if(CARD_COUNT > 1)
     {
-        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        for(int i=0; i < CARD_COUNT; i++)
         {
-            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
             
             curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(BASE_START));
             
@@ -317,9 +370,9 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (void)swipeCloseCards
 {
-    for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
     {
-        UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
         
         curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(0));
     }       
@@ -333,11 +386,11 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
         
-        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
         {
             UIImage *backsideImage = [UIImage imageNamed:@"backside.jpg"];
             
-            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
             curCardImgView.image = backsideImage;
         }    
     }
@@ -345,21 +398,25 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
         
-        for(int i=0; i < [self.cardDeckImgViewMutArray count]; i++)
+        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
         {
             NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
             UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
             
-            UIImageView *curCardImgView = (UIImageView *)[self.cardDeckImgViewMutArray objectAtIndex:i];
+            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
             curCardImgView.image = curCardImage;
         }    
     }
     
     
-    [UIView transitionWithView:self.cardContainerView
+    [UIView transitionWithView:self.cardContainerImgView
                       duration:0.8
                        options:animationOptionIdx
                     animations:^{ 
+                        
+                    }
+     
+                    completion:^(BOOL finished) {
                         
                         if(IS_FACING_FRONT)
                         {
@@ -369,11 +426,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
                         else
                         {
                             IS_FACING_FRONT = TRUE;
-                                                    
-                        }
-                    }
-     
-                    completion:^(BOOL finished) {
+                            
+                        }   
                         
                     }];
 }
@@ -386,7 +440,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     currentSession = nil;
     
     GKCardViewController_iPhone *rootVC_iphone = APP_DELEGATE_IPHONE.viewController;
-    [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view];
+    [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0];
 }
 
 

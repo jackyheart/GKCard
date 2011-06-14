@@ -14,6 +14,6 @@
 
 @property (nonatomic, retain) IBOutlet UIWindow *window;
 
--(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView;
+-(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView withDirection:(int)dir;
 
 @end

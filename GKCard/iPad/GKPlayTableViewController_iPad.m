@@ -13,7 +13,7 @@
 
 typedef enum { 
     
-    CARD_STACK_BALANCED = 0,
+    CARD_FULLY_STACKED = 0,
     CARD_EXPANDED_LEFT,
     CARD_EXPANDED_RIGHT
 
@@ -34,6 +34,7 @@ typedef enum {
 @synthesize cardContainerImgView;
 @synthesize swipeAreaView;
 @synthesize currentSession;
+@synthesize sbJSON;
 
 //private variables
 GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
@@ -54,6 +55,8 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     [cardContainerImgView release];
     [swipeAreaView release];
     [currentSession release];
+    [sbJSON release];
+    
     [super dealloc];
 }
 
@@ -74,6 +77,10 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     
     //=== get app delegate
     APP_DELEGATE_IPAD = [[UIApplication sharedApplication] delegate];
+    
+    //=== initialize SBJSON
+    self.sbJSON = [[SBJSON alloc] init];
+    self.sbJSON.humanReadable = YES;
     
     //=== init mutable array
     self.cardDictMutArray = [NSMutableArray array];  
@@ -139,7 +146,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     [swipeRightGesture release];     
     
     //=== set variables
-    CUR_CARD_STACK_STATUS = CARD_STACK_BALANCED;
+    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
     IS_CARD_CONTAINER_FACING_FRONT = TRUE;
 }
 
@@ -168,7 +175,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         
         [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
             
-            if(CUR_CARD_STACK_STATUS == CARD_STACK_BALANCED)
+            if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
             {
                 [self swipeOpenCardsWithDirection:0];
             }
@@ -186,7 +193,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         
         [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
             
-            if(CUR_CARD_STACK_STATUS == CARD_STACK_BALANCED)
+            if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
             {
                 [self swipeOpenCardsWithDirection:1];
             }
@@ -262,6 +269,32 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     }
 }
 
+- (void)session:(GKSession *)session didFailWithError:(NSError *)error
+{
+    
+}
+
+- (void) receiveData:(NSData *)data fromPeer:(NSString *)peer inSession: (GKSession *)session context:(void *)context
+{
+    NSString *dataStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+    
+    NSError *error;
+    NSDictionary *dataDictionary = [self.sbJSON objectWithString:dataStr error:&error];
+    
+    if(! dataDictionary)
+    {
+        NSLog(@"JSON parsing failed: %@", [error localizedDescription]);
+    }
+    else
+    {
+        NSLog(@"JSON parsing success");
+        
+        
+    }
+    
+    [dataStr release];
+}
+
 #pragma mark - App logic
 
 - (void)startBluetooth
@@ -290,17 +323,6 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     {
         NSLog(@"current BT session not available");
     }    
-}
-
-- (IBAction)disconnectBtnPressed:(id)sender
-{
-    //disconnect bluetooth
-    [self.currentSession disconnectFromAllPeers];
-    [self.currentSession release];
-    currentSession = nil;
-    
-    GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
-    [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view];
 }
 
 - (void)swipeOpenCardsWithDirection:(int)dir
@@ -337,7 +359,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         v.transform = CGAffineTransformMakeTranslation(0.0, 0.0);
     }    
     
-    CUR_CARD_STACK_STATUS = CARD_STACK_BALANCED;
+    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
 - (IBAction)flipBtnPressed:(id)sender
@@ -391,6 +413,17 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
                             IS_CARD_CONTAINER_FACING_FRONT = TRUE;
                         }   
                     }];    
+}
+
+- (IBAction)disconnectBtnPressed:(id)sender
+{
+    //disconnect bluetooth
+    [self.currentSession disconnectFromAllPeers];
+    [self.currentSession release];
+    currentSession = nil;
+    
+    GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
+    [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0];
 }
 
 @end
