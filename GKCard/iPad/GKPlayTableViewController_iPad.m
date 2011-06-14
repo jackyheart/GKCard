@@ -423,7 +423,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     currentSession = nil;
     
     GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
-    [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0];
+    [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0 fromDevice:@"iPad"];
 }
 
 @end

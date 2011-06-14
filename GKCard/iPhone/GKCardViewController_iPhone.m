@@ -71,7 +71,7 @@ GKCardAppDelegate *APP_DELEGATE;
 
 - (IBAction)startBtnPressed:(id)sender
 {
-    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIphoneVC.view withDirection:1];
+    [APP_DELEGATE transitionFromView:self.view toView:self.gkTableIphoneVC.view withDirection:1 fromDevice:@"iPhone"];
     
     //[self.gkTableIphoneVC startBluetooth];
 }

@@ -119,7 +119,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     }
     
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
-    
+    self.cardContainerImgView.userInteractionEnabled = YES;
+    self.cardContainerImgView.clipsToBounds = YES;  
     
     //=== swipe gesture
     UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
@@ -139,7 +140,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     
     //=== set variables
-    IS_FACING_FRONT = YES;
+    IS_CARD_CONTAINER_FACING_FRONT = YES;
    
 }
 
@@ -197,6 +198,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     if(recognizer.state == UIGestureRecognizerStateBegan)
     {
         CARD_INITIAL_TRANSFORM = recognizer.view.transform;
+    
+        self.cardNameLabel.text = [NSString stringWithFormat:@"idx: %d", recognizer.view.tag];
     }
     
     recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
@@ -382,20 +385,35 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 {   
     int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
     
-    if(IS_FACING_FRONT)
+    int CARD_COUNT = [self.cardContainerImgView.subviews count];
+    
+    if(IS_CARD_CONTAINER_FACING_FRONT)
     {
+        //flip card index
+        for(int i=0; i < CARD_COUNT; i++)
+        {
+            UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+            imgView.tag = (CARD_COUNT - 1) - i;
+        }      
+        
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
         
         for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
         {
             UIImage *backsideImage = [UIImage imageNamed:@"backside.jpg"];
-            
             UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
             curCardImgView.image = backsideImage;
         }    
     }
     else 
     {
+        //flip card index
+        for(int i=0; i < CARD_COUNT; i++)
+        {
+            UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+            imgView.tag = i;
+        }       
+        
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
         
         for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
@@ -418,18 +436,18 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
      
                     completion:^(BOOL finished) {
                         
-                        if(IS_FACING_FRONT)
+                        if(IS_CARD_CONTAINER_FACING_FRONT)
                         {
-                            IS_FACING_FRONT = FALSE;
+                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
                             
                         }
                         else
                         {
-                            IS_FACING_FRONT = TRUE;
-                            
+                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
                         }   
                         
                     }];
+     
 }
 
 - (IBAction)disconnectBtnPressed:(id)sender
@@ -440,7 +458,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     currentSession = nil;
     
     GKCardViewController_iPhone *rootVC_iphone = APP_DELEGATE_IPHONE.viewController;
-    [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0];
+    [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0 fromDevice:@"iPhone"];
 }
 
 

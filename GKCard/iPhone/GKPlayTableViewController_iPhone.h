@@ -19,7 +19,7 @@
     IBOutlet UIView *swipeAreaView;
     
     @private NSMutableArray *cardDictMutArray;
-    @private BOOL IS_FACING_FRONT;
+    @private BOOL IS_CARD_CONTAINER_FACING_FRONT;
     
     @private CGAffineTransform CARD_INITIAL_TRANSFORM;
         
@@ -33,7 +33,7 @@
 
 @property (nonatomic, retain) UILabel *numCardsLabel;
 @property (nonatomic, retain) UILabel *cardNameLabel;
-@property (nonatomic, retain) UIView *cardContainerImgView;
+@property (nonatomic, retain) UIImageView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) GKSession *currentSession;

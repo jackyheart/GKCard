@@ -58,13 +58,17 @@
 							<string key="NSResourceName">poker_table.jpg</string>
 						</object>
 					</object>
-					<object class="IBUIImageView" id="649561416">
+					<object class="IBUIImageView" id="394219447">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">274</int>
 						<string key="NSFrame">{{0, 40}, {320, 291}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="104447455"/>
+						<object class="NSColor" key="IBUIBackgroundColor" id="192249366">
+							<int key="NSColorSpace">1</int>
+							<bytes key="NSRGB">MCAwIDAAA</bytes>
+						</object>
 						<bool key="IBUIUserInteractionEnabled">NO</bool>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
@@ -109,10 +113,7 @@
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
 						<reference key="NSNextKeyView" ref="755547275"/>
-						<object class="NSColor" key="IBUIBackgroundColor">
-							<int key="NSColorSpace">1</int>
-							<bytes key="NSRGB">MCAwIDAAA</bytes>
-						</object>
+						<reference key="IBUIBackgroundColor" ref="192249366"/>
 						<float key="IBUIAlpha">0.5</float>
 						<string key="targetRuntimeIdentifier">IBCocoaTouchFramework</string>
 					</object>
@@ -197,7 +198,7 @@
 						<string key="NSFrame">{{106, 10}, {30, 21}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="470324222"/>
+						<reference key="NSNextKeyView" ref="997681470"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
@@ -211,13 +212,13 @@
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 						<float key="IBUIMinimumFontSize">10</float>
 					</object>
-					<object class="IBUILabel" id="470324222">
+					<object class="IBUILabel" id="997681470">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{167, 10}, {44, 20}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="460127905"/>
+						<reference key="NSNextKeyView" ref="737525239"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
@@ -231,13 +232,13 @@
 						<bool key="IBUIAdjustsFontSizeToFit">NO</bool>
 						<float key="IBUIMinimumFontSize">10</float>
 					</object>
-					<object class="IBUILabel" id="460127905">
+					<object class="IBUILabel" id="737525239">
 						<reference key="NSNextResponder" ref="191373211"/>
 						<int key="NSvFlags">292</int>
 						<string key="NSFrame">{{206, 10}, {107, 20}}</string>
 						<reference key="NSSuperview" ref="191373211"/>
 						<reference key="NSWindow"/>
-						<reference key="NSNextKeyView" ref="649561416"/>
+						<reference key="NSNextKeyView" ref="394219447"/>
 						<bool key="IBUIOpaque">NO</bool>
 						<bool key="IBUIClipsSubviews">YES</bool>
 						<int key="IBUIContentMode">7</int>
@@ -313,11 +314,19 @@
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBCocoaTouchOutletConnection" key="connection">
+						<string key="label">cardNameLabel</string>
+						<reference key="source" ref="372490531"/>
+						<reference key="destination" ref="737525239"/>
+					</object>
+					<int key="connectionID">26</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBCocoaTouchOutletConnection" key="connection">
 						<string key="label">cardContainerImgView</string>
 						<reference key="source" ref="372490531"/>
-						<reference key="destination" ref="649561416"/>
+						<reference key="destination" ref="394219447"/>
 					</object>
-					<int key="connectionID">21</int>
+					<int key="connectionID">27</int>
 				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
@@ -339,9 +348,9 @@
 							<reference ref="902258553"/>
 							<reference ref="770285151"/>
 							<reference ref="475854034"/>
-							<reference ref="649561416"/>
-							<reference ref="470324222"/>
-							<reference ref="460127905"/>
+							<reference ref="394219447"/>
+							<reference ref="997681470"/>
+							<reference ref="737525239"/>
 							<reference ref="627142138"/>
 						</object>
 						<reference key="parent" ref="0"/>
@@ -400,18 +409,18 @@
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">20</int>
-						<reference key="object" ref="649561416"/>
+						<reference key="object" ref="394219447"/>
 						<reference key="parent" ref="191373211"/>
 						<string key="objectName">Image View - card container</string>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">22</int>
-						<reference key="object" ref="470324222"/>
+						<reference key="object" ref="997681470"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
 					<object class="IBObjectRecord">
 						<int key="objectID">24</int>
-						<reference key="object" ref="460127905"/>
+						<reference key="object" ref="737525239"/>
 						<reference key="parent" ref="191373211"/>
 					</object>
 				</object>
@@ -465,7 +474,7 @@
 				<reference key="dict.values" ref="0"/>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">25</int>
+			<int key="maxID">27</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -510,12 +519,14 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>cardContainerImgView</string>
+							<string>cardNameLabel</string>
 							<string>numCardsLabel</string>
 							<string>swipeAreaView</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>UIImageView</string>
+							<string>UILabel</string>
 							<string>UILabel</string>
 							<string>UIView</string>
 						</object>
@@ -525,6 +536,7 @@
 						<object class="NSArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
 							<string>cardContainerImgView</string>
+							<string>cardNameLabel</string>
 							<string>numCardsLabel</string>
 							<string>swipeAreaView</string>
 						</object>
@@ -533,6 +545,10 @@
 							<object class="IBToOneOutletInfo">
 								<string key="name">cardContainerImgView</string>
 								<string key="candidateClassName">UIImageView</string>
+							</object>
+							<object class="IBToOneOutletInfo">
+								<string key="name">cardNameLabel</string>
+								<string key="candidateClassName">UILabel</string>
 							</object>
 							<object class="IBToOneOutletInfo">
 								<string key="name">numCardsLabel</string>

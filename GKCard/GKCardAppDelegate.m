@@ -68,30 +68,34 @@
 
 #pragma mark - view transition
 
--(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView withDirection:(int)dir
+-(void)transitionFromView:(UIView *)fromView toView:(UIView *)toView withDirection:(int)dir fromDevice:(NSString*)deviceString
 {
-    /*
-	[UIView beginAnimations:nil context:NULL];
-	[UIView setAnimationDuration:1.0];
-	[UIView setAnimationTransition:UIViewAnimationOptionTransitionFlipFromRight forView:self.window cache:YES];
-	[fromView removeFromSuperview];
-	[self.window addSubview:toView];
-	[UIView commitAnimations];
-    
-     */
-    
  	CATransition *animation = [CATransition animation];
 	[animation setType:kCATransitionPush];
     
     if(dir == 0)
     {
         //slide from left
-        [animation setSubtype:kCATransitionFromLeft];
+        if([deviceString isEqualToString:@"iPhone"])
+        {
+            [animation setSubtype:kCATransitionFromLeft];
+        }
+        else if([deviceString isEqualToString:@"iPad"])
+        {
+            [animation setSubtype:kCATransitionFromBottom];
+        }
     }
     else if(dir == 1)
     {
         //slide from right
-        [animation setSubtype:kCATransitionFromRight];        
+        if([deviceString isEqualToString:@"iPhone"])
+        {
+            [animation setSubtype:kCATransitionFromRight];   
+        }
+        else if([deviceString isEqualToString:@"iPad"])
+        {
+            [animation setSubtype:kCATransitionFromTop];
+        }  
     }
     
 	[animation setDuration:0.5];
