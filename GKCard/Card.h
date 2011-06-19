@@ -11,14 +11,14 @@
 
 @interface Card : NSObject {
     
-    NSString *imageName;
-    NSString *humanName;
+    UIImage *cardImage;
+    NSString *cardName;
     float value;
     BOOL isFacingUp;
 }
 
-@property (nonatomic, retain) NSString *imageName;
-@property (nonatomic, retain) NSString *humanName;
+@property (nonatomic, retain) UIImage *cardImage;
+@property (nonatomic, retain) NSString *cardName;
 @property (nonatomic, assign) float value;
 @property (nonatomic, assign) BOOL isFacingUp;
 

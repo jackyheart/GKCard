@@ -20,7 +20,6 @@ typedef enum {
 } CARD_STACK_STATUS;
 
 
-
 @interface GKPlayTableViewController_iPad (private)
 
 - (void)swipeOpenCardsWithDirection:(int)dir;
@@ -146,8 +145,8 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     [swipeRightGesture release];     
     
     //=== set variables
-    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
     IS_CARD_CONTAINER_FACING_FRONT = TRUE;
+    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
 - (void)viewDidUnload

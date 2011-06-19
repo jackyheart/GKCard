@@ -17,13 +17,15 @@
     IBOutlet UILabel *cardNameLabel;
     IBOutlet UIImageView *cardContainerImgView;
     IBOutlet UIView *swipeAreaView;
-    IBOutlet UIView *bluetoothArrowView;
+    IBOutlet UIView *bluetoothSendView;
+    IBOutlet UIImageView *bluetoothOverlayImgView;
     
     @private UIImage *backsideImage;//backside img
     
     @private NSMutableArray *cardDictMutArray;
     @private NSMutableArray *cardObjectMutArray;
     @private BOOL IS_CARD_CONTAINER_FACING_FRONT;
+    @private int CUR_CARD_STACK_STATUS;
     
     @private CGAffineTransform CARD_INITIAL_TRANSFORM;
         
@@ -39,7 +41,8 @@
 @property (nonatomic, retain) UILabel *cardNameLabel;
 @property (nonatomic, retain) UIImageView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
-@property (nonatomic, retain) UIView *bluetoothArrowView;
+@property (nonatomic, retain) UIView *bluetoothSendView;
+@property (nonatomic, retain) UIImageView *bluetoothOverlayImgView;
 @property (nonatomic, retain) UIImage *backsideImage;
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) NSMutableArray *cardObjectMutArray;

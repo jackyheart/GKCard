@@ -14,10 +14,18 @@
 
 #define RADIANS( degrees ) ( degrees * M_PI / 180 )
 
+typedef enum { 
+    
+    CARD_FULLY_STACKED = 0,
+    CARD_EXPANDED_LEFT,
+    CARD_EXPANDED_RIGHT
+    
+} CARD_STACK_STATUS;
+
 @interface GKPlayTableViewController_iPhone (private)
 
 - (void)sendCardToIPadWithIndex:(int)cardIdx;
-- (void)swipeOpenCards;
+- (void)swipeOpenCardsWithDirection:(int)dir;
 - (void)swipeCloseCards;
 - (BOOL)isOnBluetoothArrow:(CGPoint)touchPoint;
 - (void)updateNumOfCards;
@@ -30,7 +38,8 @@
 @synthesize cardNameLabel;
 @synthesize cardContainerImgView;
 @synthesize swipeAreaView;
-@synthesize bluetoothArrowView;
+@synthesize bluetoothSendView;
+@synthesize bluetoothOverlayImgView;
 @synthesize backsideImage;
 @synthesize cardDictMutArray;
 @synthesize cardObjectMutArray;
@@ -55,7 +64,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     [cardNameLabel release];
     [cardContainerImgView release];
     [swipeAreaView release];
-    [bluetoothArrowView release];
+    [bluetoothSendView release];
+    [bluetoothOverlayImgView release];
     [backsideImage release];
     [cardDictMutArray release];
     [cardObjectMutArray release];
@@ -119,7 +129,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         //insert Card to the mutable array
         Card *newCard = [[Card alloc] init];
         
-        newCard.imageName = imageNameString;
+        newCard.cardImage = [UIImage imageNamed:imageNameString];
         newCard.isFacingUp = TRUE;
         newCard.value = 0.0;
         
@@ -188,7 +198,6 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     [swipeLeftGesture release];
     
-
     
     UISwipeGestureRecognizer *swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
     
@@ -200,7 +209,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = YES;
-   
+    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
 - (void)viewDidUnload
@@ -239,11 +248,10 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     else
     {
         theCard.isFacingUp = TRUE;
-        cardImgView.image = [UIImage imageNamed:theCard.imageName];
+        cardImgView.image = theCard.cardImage;
     }
     
     NSLog(@"Card: %@", theCard);
-    NSLog(@"theCard imgName: %@", theCard.imageName);
     NSLog(@"theCard value:%f", theCard.value);
     NSLog(@"theCard facing: %d", theCard.isFacingUp);   
 }
@@ -275,10 +283,10 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         {
             NSLog(@"send out card");
             
-            self.bluetoothArrowView.backgroundColor = [UIColor clearColor];
-            
-            [UIView animateWithDuration:0.8 delay:0.0 options:UIViewAnimationOptionCurveLinear 
+            [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
                              animations:^(void) {
+                                 
+                                 self.bluetoothOverlayImgView.alpha = 0.0;
                                  
                                  recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -200.0);                                 
                                  
@@ -319,21 +327,43 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         NSLog(@"left swipe detected");
         
-        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
-            
-            [self swipeOpenCards];
-            
-        } completion:NULL];
+        if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
+        {
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                
+                [self swipeOpenCardsWithDirection:0];
+                
+            } completion:NULL];
+        }
+        else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+        {
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                
+                [self swipeCloseCards];
+                
+            } completion:NULL];         
+        }
     }
     else if(recognizer.direction == UISwipeGestureRecognizerDirectionRight)
     {
         NSLog(@"right swipe detected");
         
-        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
-            
-            [self swipeCloseCards];
-            
-        } completion:NULL];    
+        if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
+        {
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                
+                [self swipeOpenCardsWithDirection:1];
+                
+            } completion:NULL];          
+        }
+        else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+        {
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                
+                [self swipeCloseCards];
+                
+            } completion:NULL];    
+        }
     }
     else
     {
@@ -437,6 +467,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
          
         NSError *error;
         NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
+
         
         if (! jsonString)
         {
@@ -444,6 +475,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         }
         else
         {
+            NSLog(@"json string to send out: %@", jsonString);
+            
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
             NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
             
@@ -456,7 +489,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     }
 }
 
-- (void)swipeOpenCards
+- (void)swipeOpenCardsWithDirection:(int)dir
 {
     int CARD_COUNT = [self.cardContainerImgView.subviews count];
     
@@ -464,6 +497,20 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     float middleIndexRounded = roundf(middleIndexDecimal);
     
     float BASE_INCR = 5.0;
+    
+    if(dir == 0)
+    {
+        //left
+        BASE_INCR = 5.0;
+        CUR_CARD_STACK_STATUS = CARD_EXPANDED_LEFT;
+    }
+    else
+    {
+        //right
+        BASE_INCR = -5.0;
+        CUR_CARD_STACK_STATUS = CARD_EXPANDED_RIGHT;
+    }
+
     float BASE_START = -(BASE_INCR) * middleIndexRounded;//increment of 15 degrees * number of cards (converted index)
     int middleIndexInteger = (int)middleIndexRounded;
     
@@ -512,18 +559,26 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         curCardImgView.transform = CGAffineTransformMakeRotation(RADIANS(0));
     }       
+    
+    CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
 - (BOOL)isOnBluetoothArrow:(CGPoint)touchPoint
 {
-    if(CGRectContainsPoint(self.bluetoothArrowView.frame, touchPoint))
+    if(CGRectContainsPoint(self.bluetoothSendView.frame, touchPoint))
     {
-        self.bluetoothArrowView.backgroundColor = [UIColor blackColor];
+        self.bluetoothOverlayImgView.alpha = 0.5;
         return TRUE;
     }
     else
     {
-        self.bluetoothArrowView.backgroundColor = [UIColor clearColor];
+        [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            self.bluetoothOverlayImgView.alpha = 0.0;
+            
+        } completion:^(BOOL finished) {
+            
+        }];
     }
     
     return FALSE;
@@ -551,14 +606,25 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
         
+        /*
         for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
         {
             UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            curCardImgView.image = self.backsideImage;
             
-            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:i];
-            theCard.isFacingUp = FALSE;
-        }    
+            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:curCardImgView.tag];
+            
+            if(theCard.isFacingUp)
+            {
+                curCardImgView.image = self.backsideImage;
+                theCard.isFacingUp = FALSE;
+            }
+            else
+            {
+                curCardImgView.image = theCard.cardImage;
+                theCard.isFacingUp = TRUE;
+            }
+        } 
+         */
     }
     else 
     {
@@ -571,6 +637,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
         
+        /*
         for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
         {
             NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
@@ -581,8 +648,49 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
             
             Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:i];
             theCard.isFacingUp = TRUE;       
-        }    
+        }  
+        */
+        
+        
+        /*
+        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
+        {
+            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:i];
+            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+            
+            if(theCard.isFacingUp)
+            {
+                curCardImgView.image = self.backsideImage;
+                theCard.isFacingUp = FALSE;
+            }
+            else
+            {
+                curCardImgView.image = theCard.cardImage;
+                theCard.isFacingUp = TRUE;
+            }
+        }     
+        */
+        
     }
+    
+    
+    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:curCardImgView.tag];
+        
+        if(theCard.isFacingUp)
+        {
+            curCardImgView.image = self.backsideImage;
+            theCard.isFacingUp = FALSE;
+        }
+        else
+        {
+            curCardImgView.image = theCard.cardImage;
+            theCard.isFacingUp = TRUE;
+        }
+    }   
     
     
     [UIView transitionWithView:self.cardContainerImgView

@@ -11,8 +11,8 @@
 
 @implementation Card
 
-@synthesize imageName;
-@synthesize humanName;
+@synthesize cardImage;
+@synthesize cardName;
 @synthesize value;
 @synthesize isFacingUp;
 
@@ -23,8 +23,8 @@
 
 - (void)dealloc
 {
-    [imageName release];
-    [humanName release];
+    [cardImage release];
+    [cardName release];
     
     [super dealloc];
 }
