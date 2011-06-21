@@ -10,6 +10,8 @@
 #import "GKCardAppDelegate_iPad.h"
 #import "GKCardViewController_iPad.h"
 #import "GKPlayTableViewController_iPad.h"
+#import "PeerIphoneViewController.h"
+#import "Card.h"
 
 typedef enum { 
     
@@ -22,16 +24,23 @@ typedef enum {
 
 @interface GKPlayTableViewController_iPad (private)
 
+- (void)sendCardToIPhoneWithIndex:(int)cardIdx;
 - (void)swipeOpenCardsWithDirection:(int)dir;
 - (void)swipeCloseCards;
+- (BOOL)isOnPeerIphone:(CGPoint)touchPoint;
+- (void)updateNumOfCards;
 
 @end
 
 @implementation GKPlayTableViewController_iPad
-@synthesize cardDictMutArray;
+
 @synthesize numCardsLabel;
 @synthesize cardContainerImgView;
 @synthesize swipeAreaView;
+@synthesize backsideImage;
+@synthesize cardDictMutArray;
+@synthesize cardObjectMutArray;
+@synthesize peerIphoneVCMutArray;
 @synthesize currentSession;
 @synthesize sbJSON;
 
@@ -49,10 +58,13 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 
 - (void)dealloc
 {
-    [cardDictMutArray release];
     [numCardsLabel release];
     [cardContainerImgView release];
     [swipeAreaView release];
+    [backsideImage release];
+    [cardDictMutArray release];
+    [cardObjectMutArray release];  
+    [peerIphoneVCMutArray release];
     [currentSession release];
     [sbJSON release];
     
@@ -91,12 +103,34 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     
     [dict release];
     
+    //=== backside image
+    self.backsideImage = [UIImage imageNamed:@"backside.jpg"];  
+    
+    //=== populate card array
+    
+    self.cardObjectMutArray = [NSMutableArray array];   
     
     for(int i=0; i < [self.cardDictMutArray count]; i++)
     {
         NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
         
-        UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
+        NSString *imageNameString = [cardDict objectForKey:@"imageName"];
+        
+        
+        //insert Card to the mutable array
+        Card *newCard = [[Card alloc] init];
+        
+        newCard.cardImage = [UIImage imageNamed:imageNameString];
+        newCard.isFacingUp = TRUE;
+        newCard.value = 0.0;
+        
+        [self.cardObjectMutArray addObject:newCard];
+        
+        
+        [newCard release];
+        
+        
+        UIImage *curCardImage = [UIImage imageNamed:imageNameString];
         UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
         curCardImgView.userInteractionEnabled = YES;
         
@@ -143,6 +177,24 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     [self.cardContainerImgView addGestureRecognizer:swipeRightGesture];
     
     [swipeRightGesture release];     
+    
+    
+    //=== allocate peerIphoneVC
+    self.peerIphoneVCMutArray = [NSMutableArray array];
+    
+    for(int i=0; i < 4; i++)
+    {
+        PeerIphoneViewController *peerIphoneVC = [[PeerIphoneViewController alloc]
+                                                  initWithNibName:@"PeerIphoneViewController" bundle:nil];
+        
+        peerIphoneVC.view.frame = CGRectMake(i * 200 + 150, 50, peerIphoneVC.view.frame.size.width, peerIphoneVC.view.frame.size.height);
+        peerIphoneVC.view.alpha = 0.6;
+        
+        [self.peerIphoneVCMutArray addObject:peerIphoneVC];
+        [self.view addSubview:peerIphoneVC.view];
+        
+        [peerIphoneVC release];
+    }
     
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = TRUE;
@@ -212,8 +264,8 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 
 - (void)panGestureHandler:(UIPanGestureRecognizer *)recognizer {
     
-    NSLog(@"panGestureHandler executed");
-    
+
+    CGPoint touchPoint = [recognizer locationInView:self.view];    
     CGPoint translation = [recognizer translationInView:self.view];
     
     if(recognizer.state == UIGestureRecognizerStateBegan)
@@ -223,9 +275,41 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     
     recognizer.view.transform = CGAffineTransformMakeTranslation(netTranslation.x + translation.x, netTranslation.y + translation.y);
     
+    [self isOnPeerIphone:touchPoint];
+    
     if(recognizer.state == UIGestureRecognizerStateEnded)
     {
         netTranslation = translation;
+        
+        BOOL isOnIphone = [self isOnPeerIphone:touchPoint];
+        
+        if(isOnIphone)
+        {
+            NSLog(@"send out card to iphone");
+            
+            [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
+                             animations:^(void) {
+                                 
+                    
+                                 recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -200.0);                                 
+                                 
+                             } completion:^(BOOL finished) {
+                                 
+                                 for(UIView *v in self.cardContainerImgView.subviews)
+                                 {
+                                     if(v.tag == recognizer.view.tag)
+                                     {
+                                         [v removeFromSuperview];
+                                     }
+                                 }
+                                 
+                                 [self updateNumOfCards];   
+                                 
+                                 [self sendCardToIPhoneWithIndex:recognizer.view.tag];
+                                 
+                             }];
+        }
+        
     }
 }
 
@@ -308,15 +392,32 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx
 {
     if(self.currentSession)
-    {  
-        NSData *data;
+    {          
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
         
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
-        data = [cardIdxStr dataUsingEncoding:NSASCIIStringEncoding];
         
-        NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
+        NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  cardIdxStr, @"cardIndex",
+                                  theCard.isFacingUp, @"cardFacing", nil];   
         
-        [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
+        NSError *error;
+        NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
+        
+        
+        if (! jsonString)
+        {
+            NSLog(@"JSON creation failed: %@", [error localizedDescription]);
+        }
+        else
+        {
+            NSLog(@"json string to send out: %@", jsonString);
+            
+            NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+            NSArray *iphoneTableArray = [NSArray arrayWithObject:@"iphone"];
+            
+            [self.currentSession sendData:data toPeers:iphoneTableArray withDataMode:GKSendDataReliable error:nil];
+        }     
     }
     else
     {
@@ -361,6 +462,34 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
+- (BOOL)isOnPeerIphone:(CGPoint)touchPoint
+{
+    BOOL isOnIphone = FALSE;
+    
+    for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
+    {
+        PeerIphoneViewController *peerIphoneVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
+        
+        if(CGRectContainsPoint(peerIphoneVC.view.frame, touchPoint))
+        {
+            isOnIphone = TRUE;
+            peerIphoneVC.view.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
+            break;
+        }
+        else
+        {
+            peerIphoneVC.view.backgroundColor = [UIColor clearColor];
+        }
+    }
+    
+    return isOnIphone;
+}
+
+- (void)updateNumOfCards
+{
+    self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
+}
+
 - (IBAction)flipBtnPressed:(id)sender
 {
     int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
@@ -370,10 +499,8 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
         
         for(UIImageView *cardImgView in self.cardContainerImgView.subviews)
-        {
-            UIImage *backsideImage = [UIImage imageNamed:@"backside.jpg"];
-            
-            cardImgView.image = backsideImage;
+        {            
+            cardImgView.image = self.backsideImage;
         }
     }
     else 

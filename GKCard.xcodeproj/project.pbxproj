@@ -43,6 +43,8 @@
 		CDDBB4B413A4661C006D1970 /* GKPlayTableViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */; };
 		CDDBB4B713A46D0F006D1970 /* card_casino_bg.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */; };
 		CDDBB4B813A46D0F006D1970 /* poker_shiny.jpg in Resources */ = {isa = PBXBuildFile; fileRef = CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */; };
+		CDEC519513B0E1A500E5FFD3 /* PeerIphoneViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = CDEC519313B0E1A500E5FFD3 /* PeerIphoneViewController.m */; };
+		CDEC519613B0E1A500E5FFD3 /* PeerIphoneViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = CDEC519413B0E1A500E5FFD3 /* PeerIphoneViewController.xib */; };
 		CDFFC8C013ADD446003F3C31 /* Card.m in Sources */ = {isa = PBXBuildFile; fileRef = CDFFC8BF13ADD446003F3C31 /* Card.m */; };
 		CDFFC8C413ADE842003F3C31 /* blue_arrow.png in Resources */ = {isa = PBXBuildFile; fileRef = CDFFC8C213ADE842003F3C31 /* blue_arrow.png */; };
 		CDFFC8C513ADE842003F3C31 /* bluetooth_icon.png in Resources */ = {isa = PBXBuildFile; fileRef = CDFFC8C313ADE842003F3C31 /* bluetooth_icon.png */; };
@@ -102,6 +104,9 @@
 		CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = GKPlayTableViewController_iPad.xib; path = iPad/GKPlayTableViewController_iPad.xib; sourceTree = "<group>"; };
 		CDDBB4B513A46D0F006D1970 /* card_casino_bg.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = card_casino_bg.jpg; sourceTree = "<group>"; };
 		CDDBB4B613A46D0F006D1970 /* poker_shiny.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = poker_shiny.jpg; sourceTree = "<group>"; };
+		CDEC519213B0E1A500E5FFD3 /* PeerIphoneViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = PeerIphoneViewController.h; path = iPad/PeerIphoneViewController.h; sourceTree = "<group>"; };
+		CDEC519313B0E1A500E5FFD3 /* PeerIphoneViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = PeerIphoneViewController.m; path = iPad/PeerIphoneViewController.m; sourceTree = "<group>"; };
+		CDEC519413B0E1A500E5FFD3 /* PeerIphoneViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = PeerIphoneViewController.xib; path = iPad/PeerIphoneViewController.xib; sourceTree = "<group>"; };
 		CDFFC8BE13ADD446003F3C31 /* Card.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Card.h; sourceTree = "<group>"; };
 		CDFFC8BF13ADD446003F3C31 /* Card.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Card.m; sourceTree = "<group>"; };
 		CDFFC8C213ADE842003F3C31 /* blue_arrow.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = blue_arrow.png; sourceTree = "<group>"; };
@@ -229,6 +234,9 @@
 				CDDBB4B013A4661C006D1970 /* GKPlayTableViewController_iPad.h */,
 				CDDBB4B113A4661C006D1970 /* GKPlayTableViewController_iPad.m */,
 				CDDBB4B213A4661C006D1970 /* GKPlayTableViewController_iPad.xib */,
+				CDEC519213B0E1A500E5FFD3 /* PeerIphoneViewController.h */,
+				CDEC519313B0E1A500E5FFD3 /* PeerIphoneViewController.m */,
+				CDEC519413B0E1A500E5FFD3 /* PeerIphoneViewController.xib */,
 			);
 			name = iPad;
 			sourceTree = "<group>";
@@ -317,6 +325,7 @@
 				CD34B31913A65C0C00B2B254 /* iphone.png in Resources */,
 				CDFFC8C413ADE842003F3C31 /* blue_arrow.png in Resources */,
 				CDFFC8C513ADE842003F3C31 /* bluetooth_icon.png in Resources */,
+				CDEC519613B0E1A500E5FFD3 /* PeerIphoneViewController.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -342,6 +351,7 @@
 				CD3DA5B613A7A51000AFB54C /* SBJsonParser.m in Sources */,
 				CD3DA5B713A7A51000AFB54C /* SBJsonWriter.m in Sources */,
 				CDFFC8C013ADD446003F3C31 /* Card.m in Sources */,
+				CDEC519513B0E1A500E5FFD3 /* PeerIphoneViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

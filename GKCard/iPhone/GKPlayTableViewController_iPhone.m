@@ -281,7 +281,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         if(isOnBTArrow)
         {
-            NSLog(@"send out card");
+            NSLog(@"send out card to ipad");
             
             [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
                              animations:^(void) {
@@ -452,11 +452,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 - (void)sendCardToIPadWithIndex:(int)cardIdx 
 {
     if(self.currentSession)
-    {  
-        //=== get card facing
-        //NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:cardIdx];
-        //NSString *cardFacing = [cardDict objectForKey:@"isFacingUp"];
-        
+    {          
         Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
    
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
@@ -605,26 +601,6 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         }      
         
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
-        
-        /*
-        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
-        {
-            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            
-            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:curCardImgView.tag];
-            
-            if(theCard.isFacingUp)
-            {
-                curCardImgView.image = self.backsideImage;
-                theCard.isFacingUp = FALSE;
-            }
-            else
-            {
-                curCardImgView.image = theCard.cardImage;
-                theCard.isFacingUp = TRUE;
-            }
-        } 
-         */
     }
     else 
     {
@@ -636,41 +612,6 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         }       
         
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
-        
-        /*
-        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
-        {
-            NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
-            UIImage *curCardImage = [UIImage imageNamed:[cardDict objectForKey:@"imageName"]];
-            
-            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            curCardImgView.image = curCardImage;
-            
-            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:i];
-            theCard.isFacingUp = TRUE;       
-        }  
-        */
-        
-        
-        /*
-        for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
-        {
-            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:i];
-            UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            
-            if(theCard.isFacingUp)
-            {
-                curCardImgView.image = self.backsideImage;
-                theCard.isFacingUp = FALSE;
-            }
-            else
-            {
-                curCardImgView.image = theCard.cardImage;
-                theCard.isFacingUp = TRUE;
-            }
-        }     
-        */
-        
     }
     
     
