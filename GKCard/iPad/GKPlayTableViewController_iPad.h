@@ -14,6 +14,7 @@
 <GKSessionDelegate, GKPeerPickerControllerDelegate> {
     
     IBOutlet UILabel *numCardsLabel;
+    IBOutlet UILabel *cardNameLabel;
     IBOutlet UIImageView *cardContainerImgView;
     IBOutlet UIView *swipeAreaView;
     
@@ -35,6 +36,7 @@
 }
 
 @property (nonatomic, retain) UILabel *numCardsLabel;
+@property (nonatomic, retain) UILabel *cardNameLabel;
 @property (nonatomic, retain) UIImageView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
 @property (nonatomic, retain) UIImage *backsideImage;
