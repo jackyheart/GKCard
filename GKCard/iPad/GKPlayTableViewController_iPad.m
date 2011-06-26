@@ -142,12 +142,13 @@ float CARD_HEIGHT = 261.0;
         curCardImgView.userInteractionEnabled = YES;
         
         curCardImgView.frame = CGRectMake(0, 0, CARD_WIDTH, CARD_HEIGHT);
-        curCardImgView.center = CGPointMake(self.cardContainerImgView.frame.size.width * 0.5, 
-                                            self.cardContainerImgView.frame.size.height * 0.5);
+        curCardImgView.center = CGPointMake(self.cardContainerImgView.center.x, 
+                                            self.cardContainerImgView.center.y);
+
         
         curCardImgView.tag = i;//tag the card
     
-        //add gesture recognizer
+        //add gesture recognizers
         
         
         //=== single tap gesture
@@ -529,11 +530,62 @@ float CARD_HEIGHT = 261.0;
                     }
                                         
                     UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+                    cardImgView.userInteractionEnabled = YES;
                     
                     cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
                                                    peerVC.view.frame.origin.y, 
                                                    cardImage.size.width, 
                                                    cardImage.size.height);
+                    
+                    
+                    cardImgView.center = CGPointMake(peerVC.view.center.x, 
+                                                     peerVC.view.center.y + 50);
+                    
+                    
+                    
+                    cardImgView.tag = cardIdx;//tag the card
+                    
+                    //add gesture recognizers
+                    
+                    
+                    //=== single tap gesture
+                    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+                    
+                    singleTapRecognizer.numberOfTouchesRequired = 1;
+                    singleTapRecognizer.numberOfTapsRequired = 1;
+                    
+                    [cardImgView addGestureRecognizer:singleTapRecognizer];
+                    
+                    [singleTapRecognizer release];
+                    
+                    
+                    //=== double tap gesture
+                    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+                    
+                    //double tap
+                    doubleTapRecognizer.numberOfTouchesRequired = 1;
+                    doubleTapRecognizer.numberOfTapsRequired = 2;
+                    
+                    [cardImgView addGestureRecognizer:doubleTapRecognizer];
+                    
+                    [doubleTapRecognizer release]; 
+                    
+                    
+                    
+                    //=== pan gesture
+                    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+                    
+                    [cardImgView addGestureRecognizer:panRecognizer]; 
+                    
+                    [panRecognizer release];        
+                    
+                    
+                    
+                    
+                    //add card to the container view
+                    [self.cardContainerImgView addSubview:cardImgView];
+                    
+                    
                     
                     
                     [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
@@ -782,6 +834,7 @@ float CARD_HEIGHT = 261.0;
     PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:btn.tag];   
     
     UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+    cardImgView.userInteractionEnabled = YES;
     
     cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
                                    peerVC.view.frame.origin.y, 
@@ -789,6 +842,45 @@ float CARD_HEIGHT = 261.0;
     
     cardImgView.center = CGPointMake(peerVC.view.center.x, 
                                      peerVC.view.center.y + 50);
+    
+    
+    
+    cardImgView.tag = cardIdx;//tag the card
+    
+    //add gesture recognizers
+    
+    
+    //=== single tap gesture
+    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+    
+    singleTapRecognizer.numberOfTouchesRequired = 1;
+    singleTapRecognizer.numberOfTapsRequired = 1;
+    
+    [cardImgView addGestureRecognizer:singleTapRecognizer];
+    
+    [singleTapRecognizer release];
+    
+    
+    //=== double tap gesture
+    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+    
+    //double tap
+    doubleTapRecognizer.numberOfTouchesRequired = 1;
+    doubleTapRecognizer.numberOfTapsRequired = 2;
+    
+    [cardImgView addGestureRecognizer:doubleTapRecognizer];
+    
+    [doubleTapRecognizer release]; 
+    
+    
+    
+    //=== pan gesture
+    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+    
+    [cardImgView addGestureRecognizer:panRecognizer]; 
+    
+    [panRecognizer release];     
+    
     
     [self.cardContainerImgView addSubview:cardImgView];
     
@@ -805,6 +897,34 @@ float CARD_HEIGHT = 261.0;
     
     [cardImgView release];
     
+}
+
+- (IBAction)combineCardBtnTapped:(id)sender
+{
+        NSLog(@"combine tapped");
+
+        
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            
+            for(UIView *v in self.cardContainerImgView.subviews)
+            {
+                //UIImageView *v = [self.cardContainerImgView.subviews objectAtIndex:0];
+                
+                NSLog(@"[before] center: %f, %f", v.center.x, v.center.y);
+            
+                v.frame = CGRectMake(self.cardContainerImgView.center.x, 
+                                     self.cardContainerImgView.center.y, 
+                                     v.frame.size.width, 
+                                     v.frame.size.height);
+                
+                NSLog(@"[after] center: %f, %f", v.center.x, v.center.y);
+            }
+            
+            
+        } completion:^(BOOL finished) {
+            
+        }];   
 }
 
 @end

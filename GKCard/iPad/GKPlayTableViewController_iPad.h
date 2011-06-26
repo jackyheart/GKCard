@@ -52,5 +52,6 @@
 - (IBAction)flipBtnPressed:(id)sender;
 - (IBAction)disconnectBtnPressed:(id)sender;
 - (IBAction)peerTestBtnPressed:(UIButton *)btn;
+- (IBAction)combineCardBtnTapped:(id)sender;
 
 @end
