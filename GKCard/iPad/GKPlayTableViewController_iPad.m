@@ -49,6 +49,8 @@ typedef enum {
 
 //private variables
 GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
+float CARD_WIDTH = 187.0;
+float CARD_HEIGHT = 261.0;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {
@@ -139,7 +141,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
         UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
         curCardImgView.userInteractionEnabled = YES;
         
-        curCardImgView.frame = CGRectMake(0, 0, 187.0, 261.0);
+        curCardImgView.frame = CGRectMake(0, 0, CARD_WIDTH, CARD_HEIGHT);
         curCardImgView.center = CGPointMake(self.cardContainerImgView.frame.size.width * 0.5, 
                                             self.cardContainerImgView.frame.size.height * 0.5);
         
@@ -525,8 +527,7 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
                     {
                         cardImage = self.backsideImage;
                     }
-                    
-                    
+                                        
                     UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
                     
                     cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
@@ -753,6 +754,57 @@ GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
     
     GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
     [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0 fromDevice:@"iPad"];
+}
+
+- (IBAction)peerTestBtnPressed:(UIButton *)btn
+{
+    int cardIdx = 3;
+    BOOL cardFacing = TRUE;
+    
+    if(btn.tag % 2 == 0)
+    {
+        cardFacing = TRUE;
+    }
+    else
+    {
+        cardFacing = FALSE;
+    }
+    
+    Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
+    theCard.isFacingUp = cardFacing;
+    UIImage *cardImage = theCard.cardImage;
+    
+    if(! cardFacing)
+    {
+        cardImage = self.backsideImage;
+    }
+    
+    PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:btn.tag];   
+    
+    UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+    
+    cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
+                                   peerVC.view.frame.origin.y, 
+                                   CARD_WIDTH, CARD_HEIGHT);
+    
+    cardImgView.center = CGPointMake(peerVC.view.center.x, 
+                                     peerVC.view.center.y + 50);
+    
+    [self.cardContainerImgView addSubview:cardImgView];
+    
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+        
+        cardImgView.center = CGPointMake(cardImgView.center.x,
+                                         cardContainerImgView.center.y);
+        
+    } completion:^(BOOL finished) {
+        
+    }];
+    
+    
+    [cardImgView release];
+    
 }
 
 @end

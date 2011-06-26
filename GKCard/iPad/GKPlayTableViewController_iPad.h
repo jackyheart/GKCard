@@ -51,5 +51,6 @@
 - (void)startBluetooth;
 - (IBAction)flipBtnPressed:(id)sender;
 - (IBAction)disconnectBtnPressed:(id)sender;
+- (IBAction)peerTestBtnPressed:(UIButton *)btn;
 
 @end
