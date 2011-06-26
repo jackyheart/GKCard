@@ -26,6 +26,7 @@
     @private int CUR_CARD_STACK_STATUS;
     @private CGPoint netTranslation;
     @private NSMutableArray *peerIphoneVCMutArray;
+    @private NSMutableArray *peerIdMutArray;
     
     //bluetooth
     @private GKSession *currentSession;
@@ -43,6 +44,7 @@
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) NSMutableArray *cardObjectMutArray;
 @property (nonatomic, retain) NSMutableArray *peerIphoneVCMutArray;
+@property (nonatomic, retain) NSMutableArray *peerIdMutArray;
 @property (nonatomic, retain) GKSession *currentSession;
 @property (nonatomic, retain) SBJSON *sbJSON;
 

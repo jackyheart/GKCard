@@ -378,6 +378,43 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     self.currentSession.delegate = self;
     [self.currentSession setDataReceiveHandler:self withContext:nil];
     
+    NSLog(@"[in iPhone] peer connected, my session mode: %d, session id:%@, session name:%@", session.sessionMode, session.sessionID, session.displayName);
+    
+    NSLog(@"[in iPhone], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
+    
+    
+    
+    if(self.currentSession)
+    {                  
+        NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"FIRST_CONNECTED", @"TYPE",
+                                  @"MASTER", @"ROLE",
+                                  session.sessionID, @"peerID", nil];   
+        
+        NSError *error;
+        NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
+        
+        
+        if (! jsonString)
+        {
+            NSLog(@"JSON creation failed: %@", [error localizedDescription]);
+        }
+        else
+        {
+            NSLog(@"json string to send out: %@", jsonString);
+            
+            NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
+            NSArray *iphoneTableArray = [NSArray arrayWithObject:peerID];//send the first data back to the newly connected peer
+            
+            [self.currentSession sendData:data toPeers:iphoneTableArray withDataMode:GKSendDataReliable error:nil];
+        }     
+    }
+    else
+    {
+        NSLog(@"current BT session not available");
+    }     
+    
+    
     picker.delegate = nil;
     [picker dismiss];
     [picker autorelease];
@@ -393,16 +430,16 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 {
     switch (state) {
         case GKPeerStateConnected:
-            NSLog(@"peer is connected");
+            NSLog(@"[in iPhone] peer is connected");
             break;
         case GKPeerStateDisconnected:
-            NSLog(@"peer is DISconnected");
+            NSLog(@"[in iPhone] peer is DISconnected");
             break;
         case GKPeerStateAvailable:
-            NSLog(@"peer is available");
+            NSLog(@"[in iPhone] peer is available");
             break;
         case GKPeerStateUnavailable:
-            NSLog(@"peer is UNavailable");
+            NSLog(@"[in iPhone] peer is UNavailable");
             break;
             
         default:
@@ -430,7 +467,51 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         NSLog(@"JSON parsing success");
         
+        NSDictionary *objectDict = [sbJSON objectWithString:dataStr error:nil];
         
+        NSString *type = [objectDict objectForKey:@"TYPE"];
+        
+        if([type isEqualToString:@"FIRST_CONNECTED"])
+        {
+            NSLog(@"first connected peer role: %@", [objectDict objectForKey:@"ROLE"]);
+            NSLog(@"first connected peer id: %@", [objectDict objectForKey:@"peerID"]);
+        }
+        else if([type isEqualToString:@"CARD"])
+        {
+            int cardIdx = [[objectDict objectForKey:@"cardIndex"] intValue];
+            BOOL cardFacing = [[objectDict objectForKey:@"cardFacing"] boolValue];
+            
+            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
+            theCard.isFacingUp = cardFacing;
+            UIImage *cardImage = theCard.cardImage;
+            
+            if(! cardFacing)
+            {
+                cardImage = self.backsideImage;
+            }
+            
+            
+            UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+            
+            cardImgView.frame = CGRectMake(0, 
+                                           -20, 
+                                           cardImage.size.width, 
+                                           cardImage.size.height);
+            
+            
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                
+                cardImgView.center = CGPointMake(cardImgView.center.x,
+                                                 cardContainerImgView.center.y);
+                
+            } completion:^(BOOL finished) {
+                
+            }];
+            
+            
+            [cardImgView release];
+      
+        }
     }
     
     [dataStr release];    
@@ -458,6 +539,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
         
         NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
+                                  @"CARD", @"TYPE",
                                   cardIdxStr, @"cardIndex",
                                   theCard.isFacingUp, @"cardFacing", nil];   
          
