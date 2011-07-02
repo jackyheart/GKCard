@@ -27,7 +27,7 @@ typedef enum {
 
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx;
 - (void)swipeOpenCardsWithDirection:(int)dir;
-- (void)swipeCloseCards;
+- (void)swipeCloseCardsWithDirection:(int)dir;
 - (BOOL)isOnPeerIphone:(CGPoint)touchPoint;
 - (void)updateNumOfCards;
 
@@ -182,13 +182,24 @@ float CARD_HEIGHT = 261.0;
         
         [panRecognizer release];    
         
-    
         
         //add to the array
         [self.cardContainerImgView addSubview:curCardImgView]; 
         
         [curCardImgView release];
-    } 
+    }
+    
+    
+    //=== pan gesture (3 fingers)
+    /*
+    UIPanGestureRecognizer *panRecognizerFullStack = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureFullStackHandler:)];
+    
+    [self.cardContainerImgView addGestureRecognizer:panRecognizerFullStack]; 
+    
+    [panRecognizerFullStack release];    
+     */
+    
+   
     
     //set number of cards label
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
@@ -201,7 +212,7 @@ float CARD_HEIGHT = 261.0;
     UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
      
     swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
-   // swipeLeftGesture.numberOfTouchesRequired = 2;
+    //swipeLeftGesture.numberOfTouchesRequired = 2;
     [self.cardContainerImgView addGestureRecognizer:swipeLeftGesture];
     
     [swipeLeftGesture release];
@@ -224,7 +235,7 @@ float CARD_HEIGHT = 261.0;
         PeerIphoneViewController *peerIphoneVC = [[PeerIphoneViewController alloc]
                                                   initWithNibName:@"PeerIphoneViewController" bundle:nil];
         
-        peerIphoneVC.view.frame = CGRectMake(i * 200 + 150, 50, peerIphoneVC.view.frame.size.width, peerIphoneVC.view.frame.size.height);
+        peerIphoneVC.view.frame = CGRectMake(i * 200 + 150, 30, peerIphoneVC.view.frame.size.width, peerIphoneVC.view.frame.size.height);
         peerIphoneVC.view.alpha = 0.6;
         
         [self.peerIphoneVCMutArray addObject:peerIphoneVC];
@@ -304,23 +315,40 @@ float CARD_HEIGHT = 261.0;
     NSLog(@"theCard facing: %d", theCard.isFacingUp);   
 }
 
+CGPoint touchDelta;
+
 - (void)panGestureHandler:(UIPanGestureRecognizer *)recognizer {
     
     CGPoint touchPoint = [recognizer locationInView:self.view];    
-    CGPoint translation = [recognizer translationInView:self.view];
+    //CGPoint translation = [recognizer translationInView:self.view];
+        
+    NSLog(@"panHandler minimumNum touches: %d", recognizer.minimumNumberOfTouches);
     
     if(recognizer.state == UIGestureRecognizerStateBegan)
     {   
-        netTranslation = CGPointMake(recognizer.view.transform.tx, recognizer.view.transform.ty);
+        self.cardNameLabel.text = [NSString stringWithFormat:@"cardIdx: %d", recognizer.view.tag];
+        
+        //netTranslation = CGPointMake(recognizer.view.transform.tx, recognizer.view.transform.ty);
+    
+        touchDelta = CGPointMake(touchPoint.x - recognizer.view.frame.origin.x, 
+                                 touchPoint.y - recognizer.view.frame.origin.y);
     }
     
-    recognizer.view.transform = CGAffineTransformMakeTranslation(netTranslation.x + translation.x, netTranslation.y + translation.y);
-          
+   // recognizer.view.transform = CGAffineTransformMakeTranslation(netTranslation.x + translation.x, netTranslation.y + translation.y);
+     
+
+    recognizer.view.frame = CGRectMake(touchPoint.x - touchDelta.x, 
+                                       touchPoint.y - touchDelta.y, 
+                                       recognizer.view.frame.size.width, 
+                                       recognizer.view.frame.size.height);
+    
+    
+    
     [self isOnPeerIphone:touchPoint];
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
     {   
-       // CUR_CARD_STACK_STATUS = CARD_STACK_UNDEFINED;
+        CUR_CARD_STACK_STATUS = CARD_STACK_UNDEFINED;
         
         BOOL isOnIphone = [self isOnPeerIphone:touchPoint];
         
@@ -353,9 +381,23 @@ float CARD_HEIGHT = 261.0;
     }
 }
 
+- (void)panGestureFullStackHandler:(UIPanGestureRecognizer *)recognizer
+{
+    /*
+    if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
+    {
+        CGPoint touchPoint = [recognizer locationInView:self.view];    
+        //CGPoint translation = [recognizer translationInView:self.view];   
+        
+        for(UIView *v in self.cardContainerImgView.subviews)
+        {
+            v.center = touchPoint;
+        } 
+    }
+     */
+}
+
 - (void)swipeGestureHandler:(UISwipeGestureRecognizer *)recognizer {
-    
-    //CGPoint location = [recognizer locationInView:self.view];
     
     if(recognizer.direction == UISwipeGestureRecognizerDirectionLeft)
     {
@@ -369,7 +411,7 @@ float CARD_HEIGHT = 261.0;
             }
             else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
             {
-                [self swipeCloseCards];
+                [self swipeCloseCardsWithDirection:0];
             }
             
         } completion:NULL];   
@@ -387,7 +429,7 @@ float CARD_HEIGHT = 261.0;
             }
             else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
             {
-                [self swipeCloseCards];
+                [self swipeCloseCardsWithDirection:1];
             }
             
         } completion:NULL]; 
@@ -413,7 +455,18 @@ float CARD_HEIGHT = 261.0;
     
     NSLog(@"[in iPad], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
     
-   
+    
+    for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
+    {
+        NSString *curPeerID = [self.peerIdMutArray objectAtIndex:i];
+        
+        PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
+        peerVC.peerNameLabel.text = [session displayNameForPeer:curPeerID];
+        
+        peerVC.view.alpha = 1.0;
+    }
+    
+    
     if(self.currentSession)
     {                  
         NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -444,8 +497,6 @@ float CARD_HEIGHT = 261.0;
         NSLog(@"current BT session not available");
     }    
     
-        
-
     picker.delegate = nil;
     [picker dismiss];
     [picker autorelease];
@@ -679,17 +730,34 @@ float CARD_HEIGHT = 261.0;
     
     for(UIView *v in self.cardContainerImgView.subviews)
     {
-        v.transform = CGAffineTransformMakeTranslation(separationVal * i, 0.0);
+        //v.transform = CGAffineTransformMakeTranslation(separationVal * i, 0.0);
+        
+        v.frame = CGRectOffset(v.frame, separationVal * i, 0.0);
         
         i++;
     }
 }
 
-- (void)swipeCloseCards
+- (void)swipeCloseCardsWithDirection:(int)dir
 {
+    float separationVal = 30.0;
+    int i=0;
+    
+    if(dir == 0)
+    {
+        //left        
+        CUR_CARD_STACK_STATUS = CARD_EXPANDED_LEFT;
+        
+        separationVal *= -1;
+    }  
+    
     for(UIView *v in self.cardContainerImgView.subviews)
     {
-        v.transform = CGAffineTransformMakeTranslation(0.0, 0.0);
+        //v.transform = CGAffineTransformMakeTranslation(0.0, 0.0);
+        
+        v.frame =  CGRectOffset(v.frame, separationVal * i, 0.0);
+        
+        i++;
     }    
     
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
@@ -901,28 +969,20 @@ float CARD_HEIGHT = 261.0;
 
 - (IBAction)combineCardBtnTapped:(id)sender
 {
-        NSLog(@"combine tapped");
-
-        
         [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
             
             
             for(UIView *v in self.cardContainerImgView.subviews)
             {
-                //UIImageView *v = [self.cardContainerImgView.subviews objectAtIndex:0];
+                //v.transform = CGAffineTransformMakeTranslation(0, 0);
                 
-                NSLog(@"[before] center: %f, %f", v.center.x, v.center.y);
-            
-                v.frame = CGRectMake(self.cardContainerImgView.center.x, 
-                                     self.cardContainerImgView.center.y, 
-                                     v.frame.size.width, 
-                                     v.frame.size.height);
-                
-                NSLog(@"[after] center: %f, %f", v.center.x, v.center.y);
+                v.center = self.cardContainerImgView.center;
             }
             
             
         } completion:^(BOOL finished) {
+            
+            CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
             
         }];   
 }
