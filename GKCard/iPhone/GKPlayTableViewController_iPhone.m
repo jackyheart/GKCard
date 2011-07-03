@@ -112,7 +112,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     
     //=== backside image
-    self.backsideImage = [UIImage imageNamed:@"backside.jpg"];
+    self.backsideImage = [UIImage imageNamed:@"card_backside_red.png"];
     
     
     //=== populate card array
@@ -123,13 +123,14 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
         
-        NSString *imageNameString = [cardDict objectForKey:@"imageName"];
+        NSString *imageNameString = [cardDict objectForKey:@"file"];
         
         
         //insert Card to the mutable array
         Card *newCard = [[Card alloc] init];
         
         newCard.cardImage = [UIImage imageNamed:imageNameString];
+        newCard.cardName = [cardDict objectForKey:@"name"];
         newCard.isFacingUp = TRUE;
         newCard.value = 0.0;
         
@@ -140,6 +141,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
         
         //create UIImageView
+        /*
         UIImage *curCardImage = [UIImage imageNamed:imageNameString];
         UIImageView *curCardImgView = [[UIImageView alloc] initWithImage:curCardImage];
         curCardImgView.userInteractionEnabled = YES;
@@ -184,6 +186,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         [self.cardContainerImgView addSubview:curCardImgView]; 
     
         [curCardImgView release];
+         */
     }
         
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
@@ -210,6 +213,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = YES;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
+    
+    self.cardNameLabel.text = @"Card: cardName";
 }
 
 - (void)viewDidUnload
@@ -229,7 +234,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (void)singleTapGestureHandler:(UITapGestureRecognizer *)recognizer
 {
-    self.cardNameLabel.text = [NSString stringWithFormat:@"cardIdx: %d", recognizer.view.tag];
+    Card *cardObject = (Card*)[self.cardObjectMutArray objectAtIndex:recognizer.view.tag];
+    self.cardNameLabel.text = [NSString stringWithFormat:@"Card: %@", cardObject.cardName];
 }
 
 - (void)doubleTapGestureHandler:(UITapGestureRecognizer *)recognizer
@@ -268,7 +274,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         CARD_INITIAL_TRANSFORM = recognizer.view.transform;
         
-        self.cardNameLabel.text = [NSString stringWithFormat:@"idx: %d", recognizer.view.tag];
+        Card *cardObject = (Card*)[self.cardObjectMutArray objectAtIndex:recognizer.view.tag];
+        self.cardNameLabel.text = [NSString stringWithFormat:@"Card: %@", cardObject.cardName];
     }
     
     recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
@@ -493,11 +500,50 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
             
             UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
             
+            cardImgView.userInteractionEnabled = YES;
+            cardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
             cardImgView.frame = CGRectMake(0, 
                                            -20, 
                                            cardImage.size.width, 
                                            cardImage.size.height);
+            cardImgView.tag = cardIdx;//tag the card
             
+            
+            //=== single tap gesture
+            UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+            
+            singleTapRecognizer.numberOfTouchesRequired = 1;
+            singleTapRecognizer.numberOfTapsRequired = 1;
+            
+            [cardImgView addGestureRecognizer:singleTapRecognizer];
+            
+            [singleTapRecognizer release];
+            
+            
+            //=== double tap gesture
+            UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+            
+            //double tap
+            doubleTapRecognizer.numberOfTouchesRequired = 1;
+            doubleTapRecognizer.numberOfTapsRequired = 2;
+            
+            [cardImgView addGestureRecognizer:doubleTapRecognizer];
+            
+            [doubleTapRecognizer release];  
+            
+            
+            //add pan gesture recognizer
+            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+            
+            [cardImgView addGestureRecognizer:panRecognizer]; 
+            
+            [panRecognizer release];    
+            
+            
+            //add to the array
+            [self.cardContainerImgView addSubview:cardImgView]; 
+            
+
             
             [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
                 

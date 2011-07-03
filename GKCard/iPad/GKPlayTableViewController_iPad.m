@@ -111,7 +111,7 @@ float CARD_HEIGHT = 261.0;
     [dict release];
     
     //=== backside image
-    self.backsideImage = [UIImage imageNamed:@"backside.jpg"];  
+    self.backsideImage = [UIImage imageNamed:@"card_backside_red.png"];  
     
     //=== populate card array
     
@@ -121,13 +121,14 @@ float CARD_HEIGHT = 261.0;
     {
         NSDictionary *cardDict = [self.cardDictMutArray objectAtIndex:i];
         
-        NSString *imageNameString = [cardDict objectForKey:@"imageName"];
+        NSString *imageNameString = [cardDict objectForKey:@"file"];
         
         
         //insert Card to the mutable array
         Card *newCard = [[Card alloc] init];
         
         newCard.cardImage = [UIImage imageNamed:imageNameString];
+        newCard.cardName = [cardDict objectForKey:@"name"];
         newCard.isFacingUp = TRUE;
         newCard.value = 0.0;
         
@@ -178,6 +179,8 @@ float CARD_HEIGHT = 261.0;
         //=== pan gesture
         UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
         
+        panRecognizer.minimumNumberOfTouches = 1;
+        panRecognizer.maximumNumberOfTouches = 1;
         [curCardImgView addGestureRecognizer:panRecognizer]; 
         
         [panRecognizer release];    
@@ -194,12 +197,13 @@ float CARD_HEIGHT = 261.0;
     /*
     UIPanGestureRecognizer *panRecognizerFullStack = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureFullStackHandler:)];
     
+    panRecognizerFullStack.minimumNumberOfTouches = 3;
+    panRecognizerFullStack.maximumNumberOfTouches = 3;
     [self.cardContainerImgView addGestureRecognizer:panRecognizerFullStack]; 
     
     [panRecognizerFullStack release];    
      */
     
-   
     
     //set number of cards label
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
@@ -288,7 +292,8 @@ float CARD_HEIGHT = 261.0;
 
 - (void)singleTapGestureHandler:(UITapGestureRecognizer *)recognizer
 {
-    self.cardNameLabel.text = [NSString stringWithFormat:@"cardIdx: %d", recognizer.view.tag];
+    Card *cardObject = (Card*)[self.cardObjectMutArray objectAtIndex:recognizer.view.tag];
+    self.cardNameLabel.text = cardObject.cardName; 
 }
 
 - (void)doubleTapGestureHandler:(UITapGestureRecognizer *)recognizer
@@ -322,11 +327,12 @@ CGPoint touchDelta;
     CGPoint touchPoint = [recognizer locationInView:self.view];    
     //CGPoint translation = [recognizer translationInView:self.view];
         
-    NSLog(@"panHandler minimumNum touches: %d", recognizer.minimumNumberOfTouches);
+    //NSLog(@"panHandler minimumNum touches: %d", recognizer.minimumNumberOfTouches);
     
     if(recognizer.state == UIGestureRecognizerStateBegan)
     {   
-        self.cardNameLabel.text = [NSString stringWithFormat:@"cardIdx: %d", recognizer.view.tag];
+        Card *cardObject = (Card*)[self.cardObjectMutArray objectAtIndex:recognizer.view.tag];
+        self.cardNameLabel.text = cardObject.cardName;
         
         //netTranslation = CGPointMake(recognizer.view.transform.tx, recognizer.view.transform.ty);
     
@@ -585,8 +591,7 @@ CGPoint touchDelta;
                     
                     cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
                                                    peerVC.view.frame.origin.y, 
-                                                   cardImage.size.width, 
-                                                   cardImage.size.height);
+                                                   CARD_WIDTH, CARD_HEIGHT);
                     
                     
                     cardImgView.center = CGPointMake(peerVC.view.center.x, 
@@ -945,6 +950,8 @@ CGPoint touchDelta;
     //=== pan gesture
     UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
     
+    panRecognizer.minimumNumberOfTouches = 1;
+    panRecognizer.maximumNumberOfTouches = 1; 
     [cardImgView addGestureRecognizer:panRecognizer]; 
     
     [panRecognizer release];     

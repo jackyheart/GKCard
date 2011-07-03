@@ -5,29 +5,421 @@
 	<key>Card</key>
 	<array>
 		<dict>
-			<key>imageName</key>
-			<string>a_heart.png</string>
+			<key>file</key>
+			<string>club_a.png</string>
 			<key>value</key>
 			<string>0</string>
+			<key>name</key>
+			<string>Ace of Clubs</string>
 		</dict>
 		<dict>
-			<key>imageName</key>
-			<string>2_spades.png</string>
+			<key>file</key>
+			<string>club_2.png</string>
 			<key>value</key>
 			<string>0</string>
+			<key>name</key>
+			<string>Two of Clubs</string>
 		</dict>
 		<dict>
-			<key>imageName</key>
-			<string>9_club.png</string>
+			<key>file</key>
+			<string>club_3.png</string>
 			<key>value</key>
 			<string>0</string>
+			<key>name</key>
+			<string>Three of Clubs</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>club_4.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Four of Clubs</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>club_5.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Five of Clubs</string>
 		</dict>
 		<dict>
-			<key>imageName</key>
-			<string>j_heart.png</string>
+			<key>file</key>
+			<string>club_6.png</string>
 			<key>value</key>
 			<string>0</string>
+			<key>name</key>
+			<string>Six of Clubs</string>
 		</dict>
+		<dict>
+			<key>file</key>
+			<string>club_7.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Seven of Clubs</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>club_8.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Eight of Clubs</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>club_9.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Nine of Clubs</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>club_10.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ten of Clubs</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>club_j.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Jack of Clubs</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>club_q.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Queen of Clubs</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>club_k.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>King of Clubs</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>diamond_a.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ace of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_2.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Two of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_3.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Three of Diamonds</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>diamond_4.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Four of Diamonds</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>diamond_5.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Five of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_6.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Six of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_7.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Seven of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_8.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Eight of Diamonds</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>diamond_9.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Nine of Diamonds</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>diamond_10.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ten of Diamonds</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>diamond_j.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Jack of Diamonds</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>diamond_q.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Queen of Diamonds</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>diamond_k.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>King of Diamonds</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>spade_a.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ace of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_2.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Two of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_3.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Three of Spades</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>spade_4.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Four of Spades</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>spade_5.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Five of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_6.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Six of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_7.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Seven of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_8.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Eight of Spades</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>spade_9.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Nine of Spades</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>spade_10.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ten of Spades</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>spade_j.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Jack of Spades</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>spade_q.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Queen of Spades</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>spade_k.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>King of Spades</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>heart_a.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ace of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_2.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Two of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_3.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Three of Hearts</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>heart_4.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Four of Hearts</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>heart_5.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Five of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_6.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Six of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_7.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Seven of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_8.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Eight of Hearts</string>
+		</dict>		
+		<dict>
+			<key>file</key>
+			<string>heart_9.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Nine of Hearts</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>heart_10.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Ten of Hearts</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>heart_j.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Jack of Hearts</string>
+		</dict>	
+		<dict>
+			<key>file</key>
+			<string>heart_q.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>Queen of Hearts</string>
+		</dict>
+		<dict>
+			<key>file</key>
+			<string>heart_k.png</string>
+			<key>value</key>
+			<string>0</string>
+			<key>name</key>
+			<string>King of Hearts</string>
+		</dict>			
 	</array>
 </dict>
 </plist>
