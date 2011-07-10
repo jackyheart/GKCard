@@ -26,6 +26,7 @@
     @private NSMutableArray *cardObjectMutArray;
     @private BOOL IS_CARD_CONTAINER_FACING_FRONT;
     @private int CUR_CARD_STACK_STATUS;
+    @private NSMutableArray *peerIdMutArray;
     
     @private CGAffineTransform CARD_INITIAL_TRANSFORM;
         
@@ -46,6 +47,7 @@
 @property (nonatomic, retain) UIImage *backsideImage;
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) NSMutableArray *cardObjectMutArray;
+@property (nonatomic, retain) NSMutableArray *peerIdMutArray;
 @property (nonatomic, retain) GKSession *currentSession;
 @property (nonatomic, retain) SBJSON *sbJSON;
 

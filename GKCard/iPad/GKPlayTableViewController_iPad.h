@@ -17,6 +17,8 @@
     IBOutlet UILabel *cardNameLabel;
     IBOutlet UIImageView *cardContainerImgView;
     IBOutlet UIView *swipeAreaView;
+    IBOutlet UIView *cardOrderView;
+    IBOutlet UIImageView *smallCardContainerImgView;
     
     @private UIImage *backsideImage;//backside img
     @private NSMutableArray *cardDictMutArray;
@@ -40,6 +42,8 @@
 @property (nonatomic, retain) UILabel *cardNameLabel;
 @property (nonatomic, retain) UIImageView *cardContainerImgView;
 @property (nonatomic, retain) UIView *swipeAreaView;
+@property (nonatomic, retain) UIView *cardOrderView;
+@property (nonatomic, retain) UIImageView *smallCardContainerImgView;
 @property (nonatomic, retain) UIImage *backsideImage;
 @property (nonatomic, retain) NSMutableArray *cardDictMutArray;
 @property (nonatomic, retain) NSMutableArray *cardObjectMutArray;
@@ -53,5 +57,9 @@
 - (IBAction)disconnectBtnPressed:(id)sender;
 - (IBAction)peerTestBtnPressed:(UIButton *)btn;
 - (IBAction)combineCardBtnTapped:(id)sender;
+- (IBAction)showCardOrderBtnTapped:(id)sender;
+- (IBAction)dismissCardOrderView:(id)sender;
+- (IBAction)shuffleBtnTapped:(id)sender;
+- (IBAction)connectBtnPressed:(id)sender;
 
 @end

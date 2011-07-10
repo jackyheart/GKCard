@@ -30,6 +30,8 @@ typedef enum {
 - (void)swipeCloseCardsWithDirection:(int)dir;
 - (BOOL)isOnPeerIphone:(CGPoint)touchPoint;
 - (void)updateNumOfCards;
+- (int)getPannedCardIdxWithCardTag:(int)cardTag;
+- (void)hoverSmallCardsWithTouchPoint:(CGPoint)touchPoint;
 
 @end
 
@@ -39,6 +41,8 @@ typedef enum {
 @synthesize cardNameLabel;
 @synthesize cardContainerImgView;
 @synthesize swipeAreaView;
+@synthesize cardOrderView;
+@synthesize smallCardContainerImgView;
 @synthesize backsideImage;
 @synthesize cardDictMutArray;
 @synthesize cardObjectMutArray;
@@ -67,6 +71,8 @@ float CARD_HEIGHT = 261.0;
     [cardNameLabel release];
     [cardContainerImgView release];
     [swipeAreaView release];
+    [cardOrderView release];
+    [smallCardContainerImgView release];
     [backsideImage release];
     [cardDictMutArray release];
     [cardObjectMutArray release];  
@@ -194,7 +200,7 @@ float CARD_HEIGHT = 261.0;
     
     
     //=== pan gesture (3 fingers)
-    /*
+
     UIPanGestureRecognizer *panRecognizerFullStack = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureFullStackHandler:)];
     
     panRecognizerFullStack.minimumNumberOfTouches = 3;
@@ -202,7 +208,6 @@ float CARD_HEIGHT = 261.0;
     [self.cardContainerImgView addGestureRecognizer:panRecognizerFullStack]; 
     
     [panRecognizerFullStack release];    
-     */
     
     
     //set number of cards label
@@ -216,7 +221,7 @@ float CARD_HEIGHT = 261.0;
     UISwipeGestureRecognizer *swipeLeftGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
      
     swipeLeftGesture.direction = UISwipeGestureRecognizerDirectionLeft;
-    //swipeLeftGesture.numberOfTouchesRequired = 2;
+    swipeLeftGesture.numberOfTouchesRequired = 2;
     [self.cardContainerImgView addGestureRecognizer:swipeLeftGesture];
     
     [swipeLeftGesture release];
@@ -225,7 +230,7 @@ float CARD_HEIGHT = 261.0;
     UISwipeGestureRecognizer *swipeRightGesture = [[UISwipeGestureRecognizer alloc] initWithTarget:self action:@selector(swipeGestureHandler:)];
     
     swipeRightGesture.direction = UISwipeGestureRecognizerDirectionRight;
-    //swipeRightGesture.numberOfTouchesRequired = 2;
+    swipeRightGesture.numberOfTouchesRequired = 2;
     [self.cardContainerImgView addGestureRecognizer:swipeRightGesture];
     
     [swipeRightGesture release];     
@@ -247,6 +252,58 @@ float CARD_HEIGHT = 261.0;
         
         [peerIphoneVC release];
     }
+    
+    
+    //=== populate the card order view
+    int itemCounter = [self.cardContainerImgView.subviews count] - 1;
+    float smallCardWidth = 50;
+    float smallCardHeight = 70;
+    float widthOffset = 10;
+    float heightOffset = 10;
+    
+    for(int i=0; i < 4; i++)
+    {
+        for(int j=0; j < 13; j++)
+        {
+            UIImageView *curCardImgView = [self.cardContainerImgView.subviews objectAtIndex:itemCounter];
+            UIImage *cardImage = curCardImgView.image;
+            
+            
+            UIImageView *smallCardImgView = [[UIImageView alloc] 
+                                             initWithImage:cardImage];
+            
+            smallCardImgView.frame = CGRectMake(j * (smallCardWidth + widthOffset) + 20, i * (smallCardHeight + heightOffset) + 20, smallCardWidth, smallCardHeight);
+            
+            smallCardImgView.contentMode = UIViewContentModeScaleAspectFill;
+            smallCardImgView.userInteractionEnabled = YES;
+            smallCardImgView.tag = itemCounter;//tag the small card
+            
+            
+            //=== pan gesture
+            
+            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panSmallCardGestureHandler:)];
+            
+            [smallCardImgView addGestureRecognizer:panRecognizer]; 
+            
+            [panRecognizer release];   
+             
+            
+            [self.smallCardContainerImgView addSubview:smallCardImgView];
+
+            
+            [smallCardImgView release];
+            
+            
+            itemCounter--;
+        }
+    }
+    
+    
+    self.cardOrderView.frame = CGRectMake(self.cardOrderView.frame.origin.x, 
+                                          768, 
+                                          self.cardOrderView.frame.size.width, 
+                                          self.cardOrderView.frame.size.height);
+    
     
     
     //=== initialize peerID mut array
@@ -318,6 +375,7 @@ float CARD_HEIGHT = 261.0;
     NSLog(@"Card: %@", theCard);
     NSLog(@"theCard value:%f", theCard.value);
     NSLog(@"theCard facing: %d", theCard.isFacingUp);   
+    NSLog(@"card ImgView tag: %d", cardImgView.tag);
 }
 
 CGPoint touchDelta;
@@ -369,6 +427,7 @@ CGPoint touchDelta;
                                  
                              } completion:^(BOOL finished) {
                                  
+                                 //for main card stack
                                  for(UIView *v in self.cardContainerImgView.subviews)
                                  {
                                      if(v.tag == recognizer.view.tag)
@@ -376,6 +435,19 @@ CGPoint touchDelta;
                                          [v removeFromSuperview];
                                      }
                                  }
+                                 
+                                 //for card order view
+                                 for(UIView *v in self.smallCardContainerImgView.subviews)
+                                 {
+                                     if(v.tag == recognizer.view.tag)
+                                     {
+                                         //v.tag = -1;
+                                         //UIImageView *imgView = (UIImageView *)v;
+                                         //imgView.image = nil;
+                                         
+                                         [v removeFromSuperview];
+                                     }
+                                 }  
                                  
                                  [self updateNumOfCards];   
                                  
@@ -389,19 +461,158 @@ CGPoint touchDelta;
 
 - (void)panGestureFullStackHandler:(UIPanGestureRecognizer *)recognizer
 {
-    /*
     if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
     {
         CGPoint touchPoint = [recognizer locationInView:self.view];    
         //CGPoint translation = [recognizer translationInView:self.view];   
         
-        for(UIView *v in self.cardContainerImgView.subviews)
-        {
-            v.center = touchPoint;
-        } 
+        [UIView animateWithDuration:0.5 delay:0.0 
+                            options:UIViewAnimationCurveEaseInOut |   
+                                    UIViewAnimationOptionAllowUserInteraction 
+                         animations:^(void) {
+            
+                             for(UIView *v in self.cardContainerImgView.subviews)
+                             {
+                                 v.center = touchPoint;
+                             }             
+            
+        } completion:^(BOOL finished) {
+            
+        }];
+        
     }
-     */
 }
+
+
+CGPoint touchDeltaSmallCard;
+CGRect oriRectSmallCard;
+CGRect destRectSmallCard;
+int PANNED_CARD_IDX = -1;
+
+- (void)panSmallCardGestureHandler:(UIPanGestureRecognizer *)recognizer
+{
+    CGPoint touchPoint = [recognizer locationInView:self.view];
+    
+    
+    if(recognizer.state == UIGestureRecognizerStateBegan)
+    {
+        recognizer.view.alpha = 0.8;
+        
+        touchDeltaSmallCard = CGPointMake(touchPoint.x - recognizer.view.frame.origin.x, 
+                                 touchPoint.y - recognizer.view.frame.origin.y);  
+        
+        oriRectSmallCard = recognizer.view.frame;
+        
+        PANNED_CARD_IDX = [self getPannedCardIdxWithCardTag:recognizer.view.tag];
+    }
+    
+    
+    recognizer.view.frame = CGRectMake(touchPoint.x - touchDeltaSmallCard.x, 
+                                       touchPoint.y - touchDeltaSmallCard.y, 
+                                       recognizer.view.frame.size.width, 
+                                       recognizer.view.frame.size.height);
+    
+    //highlight effect on hover
+    [self hoverSmallCardsWithTouchPoint:touchPoint];
+    
+   
+    if(recognizer.state == UIGestureRecognizerStateEnded)
+    {
+        //swapping logic here
+        
+        [UIView animateWithDuration:0.3 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            int CARD_COUNT = [self.cardContainerImgView.subviews count] - 1;
+            
+            for(int i=0; i < [self.smallCardContainerImgView.subviews count]; i++)
+            {
+                UIImageView *curSmallCardImgView = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:i];
+                
+                if(curSmallCardImgView.tag != recognizer.view.tag)
+                {
+                    CGPoint adjustedTouchPoint = CGPointMake(touchPoint.x - self.cardOrderView.frame.origin.x, 
+                                                             touchPoint.y - self.cardOrderView.frame.origin.y);
+                    
+                    
+                    if(CGRectContainsPoint(curSmallCardImgView.frame, adjustedTouchPoint))
+                    {
+                        //swap frames
+                        destRectSmallCard = curSmallCardImgView.frame;
+                        curSmallCardImgView.frame = oriRectSmallCard;
+                        recognizer.view.frame = destRectSmallCard;
+                        
+                        
+                        [self.smallCardContainerImgView exchangeSubviewAtIndex:PANNED_CARD_IDX withSubviewAtIndex:i];
+                        
+                        ///=== re-arrange the original card deck
+                        int ORI_CARD_IDX_1 = CARD_COUNT - PANNED_CARD_IDX;
+                        int ORI_CARD_IDX_2 = CARD_COUNT - i;
+                                                
+                        [self.cardContainerImgView exchangeSubviewAtIndex:ORI_CARD_IDX_1 withSubviewAtIndex:ORI_CARD_IDX_2];
+                        
+                        
+                        break;
+                    }
+                }
+                else if(curSmallCardImgView.tag == recognizer.view.tag)
+                {
+                    recognizer.view.frame = oriRectSmallCard;
+                }
+            }            
+        
+        } completion:^(BOOL finished) {
+            
+        }];  
+        
+        
+        //set back all alpha to 1.0
+        for(int i=0; i < [self.smallCardContainerImgView.subviews count]; i++)
+        {
+            UIImageView *curSmallCardImgView = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:i];
+            curSmallCardImgView.alpha = 1.0;
+        }
+    }  
+}
+
+- (int)getPannedCardIdxWithCardTag:(int)cardTag
+{
+    int cardIdx = 0;
+    
+    for(int i=0; i < [self.smallCardContainerImgView.subviews count]; i++)
+    {
+        UIImageView *curSmallCardImgView = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:i];
+        
+        if(curSmallCardImgView.tag == cardTag)
+        {
+            cardIdx = i;
+            
+            break;
+        }
+    }
+    
+    return cardIdx;
+}
+
+- (void)hoverSmallCardsWithTouchPoint:(CGPoint)touchPoint
+{
+    for(int i=0; i < [self.smallCardContainerImgView.subviews count]; i++)
+    {
+        UIImageView *curSmallCardImgView = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:i];
+        
+        CGPoint adjustedTouchPoint = CGPointMake(touchPoint.x - self.cardOrderView.frame.origin.x, 
+                                                 touchPoint.y - self.cardOrderView.frame.origin.y);
+        
+        if(CGRectContainsPoint(curSmallCardImgView.frame, adjustedTouchPoint))   
+        {
+            curSmallCardImgView.alpha = 0.8;
+        }
+        else
+        {
+            curSmallCardImgView.alpha = 1.0;
+        }
+    }
+}
+
 
 - (void)swipeGestureHandler:(UISwipeGestureRecognizer *)recognizer {
     
@@ -462,7 +673,7 @@ CGPoint touchDelta;
     NSLog(@"[in iPad], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
     
     
-    for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
+    for(int i=0; i < [self.peerIdMutArray count]; i++)
     {
         NSString *curPeerID = [self.peerIdMutArray objectAtIndex:i];
         
@@ -680,15 +891,16 @@ CGPoint touchDelta;
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx
 {
     if(self.currentSession)
-    {          
+    {                  
         Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
         
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
+        NSString *cardUpStr = [NSString stringWithFormat:@"%d", theCard.isFacingUp];
         
         NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   @"CARD", @"TYPE",
                                   cardIdxStr, @"cardIndex",
-                                  theCard.isFacingUp, @"cardFacing", nil];   
+                                  cardUpStr, @"cardFacing", nil];   
         
         NSError *error;
         NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
@@ -703,7 +915,9 @@ CGPoint touchDelta;
             NSLog(@"json string to send out: %@", jsonString);
             
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-            NSArray *iphoneTableArray = [NSArray arrayWithObject:@"iphone"];
+            NSArray *iphoneTableArray = (NSArray *)self.peerIdMutArray;
+            
+            NSLog(@"[in iPad] peer tbl array to send: %@", iphoneTableArray);
             
             [self.currentSession sendData:data toPeers:iphoneTableArray withDataMode:GKSendDataReliable error:nil];
         }     
@@ -796,10 +1010,11 @@ CGPoint touchDelta;
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
 }
 
+
 - (IBAction)flipBtnPressed:(id)sender
 {
     int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
-    
+   
     int CARD_COUNT = [self.cardContainerImgView.subviews count];
     
     
@@ -809,6 +1024,8 @@ CGPoint touchDelta;
     {
         UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
         CGPoint cardTranslationPoint = CGPointMake(imgView.transform.tx, imgView.transform.ty);
+        
+        
         
         NSValue *cgPointValue = [NSValue valueWithCGPoint:cardTranslationPoint];
         [cardTransformMutArray addObject:cgPointValue];
@@ -824,15 +1041,38 @@ CGPoint touchDelta;
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
     }
     
+    int CARD_TAG = -1;
     
-    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
+    for(int i=0; i < CARD_COUNT; i++)
     {
         UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
                 
-        curCardImgView.transform = CGAffineTransformMakeTranslation(-curCardImgView.transform.tx, curCardImgView.transform.ty);
+        //curCardImgView.transform = CGAffineTransformMakeTranslation(-curCardImgView.transform.tx, curCardImgView.transform.ty);
         
+        float cardCenterDeltaMoveX = curCardImgView.center.x - self.cardContainerImgView.center.x;
         
-        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:curCardImgView.tag];
+        /*
+        curCardImgView.frame = CGRectMake(-cardCenterDeltaMoveX, 
+                                          curCardImgView.frame.origin.y, 
+                                          curCardImgView.frame.size.width, 
+                                          curCardImgView.frame.size.height);
+         */
+        
+        //curCardImgView.center = CGPointMake(curCardImgView.center.x - (cardCenterDeltaMoveX * 2), curCardImgView.center.y);
+       
+        
+        if(i == (CARD_COUNT - 2))
+        {
+            NSLog(@"card:%d, cardCenterDeltaMoveX: %f", i, cardCenterDeltaMoveX);
+            //NSLog(@"card %d frame x:%f, y:%f", i, curCardImgView.frame.origin.x, curCardImgView.frame.origin.y);
+            //NSLog(@"card center: x:%f, y:%f", curCardImgView.center.x, curCardImgView.center.y);
+            
+            //NSLog(@"card: %d, transform tx:%f, ty:%f", i, curCardImgView.transform.tx, curCardImgView.transform.ty);
+        }
+        
+        CARD_TAG = curCardImgView.tag;
+                
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:CARD_TAG];
         
         if(theCard.isFacingUp)
         {
@@ -879,6 +1119,11 @@ CGPoint touchDelta;
     
     GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
     [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0 fromDevice:@"iPad"];
+}
+
+- (IBAction)connectBtnPressed:(id)sender
+{
+    [self startBluetooth];
 }
 
 - (IBAction)peerTestBtnPressed:(UIButton *)btn
@@ -992,6 +1237,121 @@ CGPoint touchDelta;
             CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
             
         }];   
+}
+
+- (IBAction)showCardOrderBtnTapped:(id)sender
+{
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveEaseInOut animations:^(void) {
+        
+        self.cardOrderView.frame = CGRectMake(self.cardOrderView.frame.origin.x, 
+                                              430, 
+                                              self.cardOrderView.frame.size.width, 
+                                              self.cardOrderView.frame.size.height);
+        
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+
+- (IBAction)dismissCardOrderView:(id)sender
+{
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveEaseInOut animations:^(void) {
+        
+        self.cardOrderView.frame = CGRectMake(self.cardOrderView.frame.origin.x, 
+                                              768, 
+                                              self.cardOrderView.frame.size.width, 
+                                              self.cardOrderView.frame.size.height);
+        
+    } completion:^(BOOL finished) {
+        
+    }];    
+}
+
+- (IBAction)shuffleBtnTapped:(id)sender
+{
+    [UIView animateWithDuration:1.0 delay:0.0 options:UIViewAnimationCurveEaseInOut animations:^(void) {
+        
+        int SHUFFLE_RUN_TIME = 100;
+        int randValCard1_idx = 0;
+        int randValCard2_idx = 0; 
+        int CARD_COUNT = [self.cardContainerImgView.subviews count] - 1;
+
+       
+        //the index used here is the index of the card container subviews, not the card tag !
+        //the card tag is the index to the information about a particular card
+        
+        for(int i=0; i < SHUFFLE_RUN_TIME; i++)
+        {
+            randValCard1_idx = (arc4random() % [self.smallCardContainerImgView.subviews count]);
+            randValCard2_idx = (arc4random() % [self.smallCardContainerImgView.subviews count]);
+            
+            //debugging
+            //NSLog(@"randValCard1: %d", randValCard1_idx);
+            //NSLog(@"randValCard2: %d", randValCard2_idx);
+            
+            //=== for the card order view
+                        
+            //get small card 1
+            
+            UIImageView *smallCardImgView_1 = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:randValCard1_idx];
+            
+            //get small card 2
+            UIImageView *smallCardImgView_2 = (UIImageView *)[self.smallCardContainerImgView.subviews objectAtIndex:randValCard2_idx];
+            
+            //holds the frame location and tag of the first card
+            CGRect tempRect = smallCardImgView_1.frame;
+            //int tempTag = smallCardImgView_1.tag;
+            //UIImage *tempImage = smallCardImgView_1.image;
+            
+            //=== swap position
+            
+            smallCardImgView_1.frame = smallCardImgView_2.frame;
+            //smallCardImgView_1.tag = smallCardImgView_2.tag;
+            //smallCardImgView_1.image = smallCardImgView_2.image;
+            
+            smallCardImgView_2.frame = tempRect;
+            //smallCardImgView_2.tag = tempTag;
+            //smallCardImgView_2.image = tempImage;
+             
+            
+            ///=== re-arrange the original card deck
+            int ORI_CARD_RAND_IDX_1 = CARD_COUNT - randValCard1_idx;
+            int ORI_CARD_RAND_IDX_2 = CARD_COUNT - randValCard2_idx;
+            
+            
+            //debugging
+            //NSLog(@"ORI_CARD_RAND_IDX_1: %d", ORI_CARD_RAND_IDX_1);
+            //NSLog(@"ORI_CARD_RAND_IDX_2: %d", ORI_CARD_RAND_IDX_2);
+            //NSLog(@"================\n\n");  
+            
+            //get card 1
+            UIImageView *cardImgView_1 = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:ORI_CARD_RAND_IDX_1]; 
+            UIImageView *cardImgView_2 = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:ORI_CARD_RAND_IDX_2];
+            
+            //holds the frame location and tag of the first card
+            CGRect tempRectOri = cardImgView_1.frame;
+            //int tempTagOri = cardImgView_1.tag;
+            //UIImage *tempImageOri = cardImgView_1.image;
+            
+            
+            //=== swap position
+            cardImgView_1.frame = cardImgView_2.frame;
+            //cardImgView_1.tag = cardImgView_2.tag;
+            //cardImgView_1.image = cardImgView_2.image;
+            
+            cardImgView_2.frame = tempRectOri;
+            //cardImgView_2.tag = tempTagOri;
+            //cardImgView_2.image = tempImageOri;
+            
+            
+            [self.smallCardContainerImgView exchangeSubviewAtIndex:randValCard1_idx withSubviewAtIndex:randValCard2_idx];
+            [self.cardContainerImgView exchangeSubviewAtIndex:ORI_CARD_RAND_IDX_1 withSubviewAtIndex:ORI_CARD_RAND_IDX_2];   
+        }
+        
+        
+    } completion:^(BOOL finished) {
+        
+    }];    
 }
 
 @end

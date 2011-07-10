@@ -43,6 +43,7 @@ typedef enum {
 @synthesize backsideImage;
 @synthesize cardDictMutArray;
 @synthesize cardObjectMutArray;
+@synthesize peerIdMutArray;
 @synthesize currentSession;
 @synthesize sbJSON;
 
@@ -69,6 +70,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     [backsideImage release];
     [cardDictMutArray release];
     [cardObjectMutArray release];
+    [peerIdMutArray release];
     [currentSession release];
     [sbJSON release];
     
@@ -213,6 +215,9 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = YES;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
+    
+    //=== initialize peer id mutable array
+    self.peerIdMutArray = [NSMutableArray array];
     
     self.cardNameLabel.text = @"Card: cardName";
 }
@@ -385,11 +390,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     self.currentSession.delegate = self;
     [self.currentSession setDataReceiveHandler:self withContext:nil];
     
+    //add peerID to the mut array
+    [self.peerIdMutArray addObject:peerID];    
+    
     NSLog(@"[in iPhone] peer connected, my session mode: %d, session id:%@, session name:%@", session.sessionMode, session.sessionID, session.displayName);
     
     NSLog(@"[in iPhone], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
-    
-    
     
     if(self.currentSession)
     {                  
@@ -413,6 +419,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
             NSArray *iphoneTableArray = [NSArray arrayWithObject:peerID];//send the first data back to the newly connected peer
             
+    
             [self.currentSession sendData:data toPeers:iphoneTableArray withDataMode:GKSendDataReliable error:nil];
         }     
     }
@@ -583,11 +590,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
    
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
+        NSString *cardUpStr = [NSString stringWithFormat:@"%d", theCard.isFacingUp];
         
         NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
                                   @"CARD", @"TYPE",
                                   cardIdxStr, @"cardIndex",
-                                  theCard.isFacingUp, @"cardFacing", nil];   
+                                  cardUpStr, @"cardFacing", nil];   
          
         NSError *error;
         NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
@@ -602,7 +610,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
             NSLog(@"json string to send out: %@", jsonString);
             
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-            NSArray *ipadTableArray = [NSArray arrayWithObject:@"ipad"];
+            NSArray *ipadTableArray = (NSArray *)self.peerIdMutArray;
             
             [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
         }
@@ -787,6 +795,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (IBAction)disconnectBtnPressed:(id)sender
 {
+    /*
     //disconnect bluetooth
     [self.currentSession disconnectFromAllPeers];
     [self.currentSession release];
@@ -794,6 +803,9 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     GKCardViewController_iPhone *rootVC_iphone = APP_DELEGATE_IPHONE.viewController;
     [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0 fromDevice:@"iPhone"];
+     */
+    
+    [self startBluetooth];
 }
 
 
