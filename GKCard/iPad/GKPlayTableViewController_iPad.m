@@ -32,6 +32,7 @@ typedef enum {
 - (void)updateNumOfCards;
 - (int)getPannedCardIdxWithCardTag:(int)cardTag;
 - (void)hoverSmallCardsWithTouchPoint:(CGPoint)touchPoint;
+- (void)updateSmallCardContainer;
 
 @end
 
@@ -135,6 +136,7 @@ float CARD_HEIGHT = 261.0;
         //insert Card to the mutable array
         Card *newCard = [[Card alloc] init];
         
+        newCard.cardID = i;
         newCard.cardImage = [UIImage imageNamed:imageNameString];
         newCard.cardName = [cardDict objectForKey:@"name"];
         newCard.isFacingUp = TRUE;
@@ -257,48 +259,7 @@ float CARD_HEIGHT = 261.0;
     
     
     //=== populate the card order view
-    int itemCounter = [self.cardContainerImgView.subviews count] - 1;
-    float smallCardWidth = 50;
-    float smallCardHeight = 70;
-    float widthOffset = 10;
-    float heightOffset = 10;
-    
-    for(int i=0; i < 4; i++)
-    {
-        for(int j=0; j < 13; j++)
-        {
-            UIImageView *curCardImgView = [self.cardContainerImgView.subviews objectAtIndex:itemCounter];
-            UIImage *cardImage = curCardImgView.image;
-            
-            
-            UIImageView *smallCardImgView = [[UIImageView alloc] 
-                                             initWithImage:cardImage];
-            
-            smallCardImgView.frame = CGRectMake(j * (smallCardWidth + widthOffset) + 20, i * (smallCardHeight + heightOffset) + 20, smallCardWidth, smallCardHeight);
-            
-            smallCardImgView.contentMode = UIViewContentModeScaleAspectFill;
-            smallCardImgView.userInteractionEnabled = YES;
-            smallCardImgView.tag = itemCounter;//tag the small card
-            
-            
-            //=== pan gesture
-            
-            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panSmallCardGestureHandler:)];
-            
-            [smallCardImgView addGestureRecognizer:panRecognizer]; 
-            
-            [panRecognizer release];   
-             
-            
-            [self.smallCardContainerImgView addSubview:smallCardImgView];
-
-            
-            [smallCardImgView release];
-            
-            
-            itemCounter--;
-        }
-    }
+    [self updateSmallCardContainer];
     
     
     self.cardOrderView.frame = CGRectMake(self.cardOrderView.frame.origin.x, 
@@ -616,6 +577,58 @@ int PANNED_CARD_IDX = -1;
             curSmallCardImgView.alpha = 1.0;
         }
     }
+}
+
+- (void)updateSmallCardContainer
+{
+    //clears existing view
+    for(UIView *v in self.smallCardContainerImgView.subviews)
+    {
+        [v removeFromSuperview];
+    }
+    
+    int itemCounter = [self.cardContainerImgView.subviews count] - 1;
+    float smallCardWidth = 50;
+    float smallCardHeight = 70;
+    float widthOffset = 10;
+    float heightOffset = 10;
+    
+    for(int i=0; i < 4; i++)
+    {
+        for(int j=0; j < 13; j++)
+        {
+            UIImageView *curCardImgView = [self.cardContainerImgView.subviews objectAtIndex:itemCounter];
+            UIImage *cardImage = curCardImgView.image;
+            
+            
+            UIImageView *smallCardImgView = [[UIImageView alloc] 
+                                             initWithImage:cardImage];
+            
+            smallCardImgView.frame = CGRectMake(j * (smallCardWidth + widthOffset) + 20, i * (smallCardHeight + heightOffset) + 20, smallCardWidth, smallCardHeight);
+            
+            smallCardImgView.contentMode = UIViewContentModeScaleAspectFill;
+            smallCardImgView.userInteractionEnabled = YES;
+            smallCardImgView.tag = itemCounter;//tag the small card
+            
+            
+            //=== pan gesture
+            
+            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panSmallCardGestureHandler:)];
+            
+            [smallCardImgView addGestureRecognizer:panRecognizer]; 
+            
+            [panRecognizer release];   
+            
+            
+            [self.smallCardContainerImgView addSubview:smallCardImgView];
+            
+            
+            [smallCardImgView release];
+            
+            
+            itemCounter--;
+        }
+    }    
 }
 
 
@@ -1136,83 +1149,89 @@ int PANNED_CARD_IDX = -1;
 
 - (IBAction)peerTestBtnPressed:(UIButton *)btn
 {
-    Card *theCard = (Card *)[self.sentOutCardMutArray lastObject];
-     
-    UIImage *cardImage = theCard.cardImage;
-    
-    if(! theCard.isFacingUp)
+    if([self.sentOutCardMutArray count] > 0)
     {
-        cardImage = self.backsideImage;
+        Card *theCard = (Card *)[self.sentOutCardMutArray lastObject];
+         
+        UIImage *cardImage = theCard.cardImage;
+        
+        if(! theCard.isFacingUp)
+        {
+            cardImage = self.backsideImage;
+        }
+        
+        PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:btn.tag];   
+        
+        UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+        cardImgView.userInteractionEnabled = YES;
+        
+        cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
+                                       peerVC.view.frame.origin.y, 
+                                       CARD_WIDTH, CARD_HEIGHT);
+        
+        cardImgView.center = CGPointMake(peerVC.view.center.x, 
+                                         peerVC.view.center.y + 50);
+        
+        
+        
+        cardImgView.tag = theCard.cardID;//tag the card
+        
+        //add gesture recognizers
+        
+        
+        //=== single tap gesture
+        UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+        
+        singleTapRecognizer.numberOfTouchesRequired = 1;
+        singleTapRecognizer.numberOfTapsRequired = 1;
+        
+        [cardImgView addGestureRecognizer:singleTapRecognizer];
+        
+        [singleTapRecognizer release];
+        
+        
+        //=== double tap gesture
+        UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+        
+        //double tap
+        doubleTapRecognizer.numberOfTouchesRequired = 1;
+        doubleTapRecognizer.numberOfTapsRequired = 2;
+        
+        [cardImgView addGestureRecognizer:doubleTapRecognizer];
+        
+        [doubleTapRecognizer release]; 
+        
+        
+        
+        //=== pan gesture
+        UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+        
+        panRecognizer.minimumNumberOfTouches = 1;
+        panRecognizer.maximumNumberOfTouches = 1; 
+        [cardImgView addGestureRecognizer:panRecognizer]; 
+        
+        [panRecognizer release];     
+        
+        
+        [self.cardContainerImgView addSubview:cardImgView];
+        
+        
+        [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+            
+            cardImgView.center = CGPointMake(cardImgView.center.x,
+                                             cardContainerImgView.center.y);
+            
+        } completion:^(BOOL finished) {
+            
+        }];
+        
+        
+        [cardImgView release];
+        
+        
+        //update card order container
+        [self updateSmallCardContainer];
     }
-    
-    PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:btn.tag];   
-    
-    UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
-    cardImgView.userInteractionEnabled = YES;
-    
-    cardImgView.frame = CGRectMake(peerVC.view.frame.origin.x, 
-                                   peerVC.view.frame.origin.y, 
-                                   CARD_WIDTH, CARD_HEIGHT);
-    
-    cardImgView.center = CGPointMake(peerVC.view.center.x, 
-                                     peerVC.view.center.y + 50);
-    
-    
-    
-    //cardImgView.tag = theCard.;//tag the card
-    
-    //add gesture recognizers
-    
-    
-    //=== single tap gesture
-    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
-    
-    singleTapRecognizer.numberOfTouchesRequired = 1;
-    singleTapRecognizer.numberOfTapsRequired = 1;
-    
-    [cardImgView addGestureRecognizer:singleTapRecognizer];
-    
-    [singleTapRecognizer release];
-    
-    
-    //=== double tap gesture
-    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
-    
-    //double tap
-    doubleTapRecognizer.numberOfTouchesRequired = 1;
-    doubleTapRecognizer.numberOfTapsRequired = 2;
-    
-    [cardImgView addGestureRecognizer:doubleTapRecognizer];
-    
-    [doubleTapRecognizer release]; 
-    
-    
-    
-    //=== pan gesture
-    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
-    
-    panRecognizer.minimumNumberOfTouches = 1;
-    panRecognizer.maximumNumberOfTouches = 1; 
-    [cardImgView addGestureRecognizer:panRecognizer]; 
-    
-    [panRecognizer release];     
-    
-    
-    [self.cardContainerImgView addSubview:cardImgView];
-    
-    
-    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
-        
-        cardImgView.center = CGPointMake(cardImgView.center.x,
-                                         cardContainerImgView.center.y);
-        
-    } completion:^(BOOL finished) {
-        
-    }];
-    
-    
-    [cardImgView release];
-    
 }
 
 - (IBAction)combineCardBtnTapped:(id)sender

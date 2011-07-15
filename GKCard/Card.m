@@ -11,6 +11,7 @@
 
 @implementation Card
 
+@synthesize cardID;
 @synthesize cardImage;
 @synthesize cardName;
 @synthesize value;
