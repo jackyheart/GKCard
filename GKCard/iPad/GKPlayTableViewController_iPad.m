@@ -50,6 +50,7 @@ typedef enum {
 @synthesize peerIdMutArray;
 @synthesize currentSession;
 @synthesize sbJSON;
+@synthesize sentOutCardMutArray;
 
 //private variables
 GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
@@ -80,6 +81,7 @@ float CARD_HEIGHT = 261.0;
     [peerIdMutArray release];
     [currentSession release];
     [sbJSON release];
+    [sentOutCardMutArray release];
     
     [super dealloc];
 }
@@ -313,6 +315,9 @@ float CARD_HEIGHT = 261.0;
     IS_CARD_CONTAINER_FACING_FRONT = TRUE;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
     
+    
+    //=== for testing
+    self.sentOutCardMutArray = [NSMutableArray array];
     
     /*
     
@@ -925,6 +930,9 @@ int PANNED_CARD_IDX = -1;
     else
     {
         NSLog(@"current BT session not available");
+        
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
+        [self.sentOutCardMutArray addObject:theCard];
     }    
 }
 
@@ -1128,23 +1136,11 @@ int PANNED_CARD_IDX = -1;
 
 - (IBAction)peerTestBtnPressed:(UIButton *)btn
 {
-    int cardIdx = 3;
-    BOOL cardFacing = TRUE;
-    
-    if(btn.tag % 2 == 0)
-    {
-        cardFacing = TRUE;
-    }
-    else
-    {
-        cardFacing = FALSE;
-    }
-    
-    Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
-    theCard.isFacingUp = cardFacing;
+    Card *theCard = (Card *)[self.sentOutCardMutArray lastObject];
+     
     UIImage *cardImage = theCard.cardImage;
     
-    if(! cardFacing)
+    if(! theCard.isFacingUp)
     {
         cardImage = self.backsideImage;
     }
@@ -1163,7 +1159,7 @@ int PANNED_CARD_IDX = -1;
     
     
     
-    cardImgView.tag = cardIdx;//tag the card
+    //cardImgView.tag = theCard.;//tag the card
     
     //add gesture recognizers
     

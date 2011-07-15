@@ -36,6 +36,9 @@
 
     //JSON
     @private SBJSON *sbJSON;
+    
+    //for testing
+    @private NSMutableArray *sentOutCardMutArray;
 }
 
 @property (nonatomic, retain) UILabel *numCardsLabel;
@@ -51,6 +54,7 @@
 @property (nonatomic, retain) NSMutableArray *peerIdMutArray;
 @property (nonatomic, retain) GKSession *currentSession;
 @property (nonatomic, retain) SBJSON *sbJSON;
+@property (nonatomic, retain) NSMutableArray *sentOutCardMutArray;
 
 - (void)startBluetooth;
 - (IBAction)flipBtnPressed:(id)sender;
