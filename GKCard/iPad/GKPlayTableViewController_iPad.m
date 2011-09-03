@@ -12,6 +12,7 @@
 #import "GKPlayTableViewController_iPad.h"
 #import "PeerIphoneViewController.h"
 #import "Card.h"
+#import "DisclaimerViewController_iPad.h"
 
 typedef enum { 
     
@@ -52,6 +53,7 @@ typedef enum {
 @synthesize currentSession;
 @synthesize sbJSON;
 @synthesize sentOutCardMutArray;
+@synthesize disclaimerVC_iPad;
 
 //private variables
 GKCardAppDelegate_iPad *APP_DELEGATE_IPAD;
@@ -83,6 +85,7 @@ float CARD_HEIGHT = 261.0;
     [currentSession release];
     [sbJSON release];
     [sentOutCardMutArray release];
+    [disclaimerVC_iPad release];
     
     [super dealloc];
 }
@@ -372,8 +375,7 @@ CGPoint touchDelta;
                                        recognizer.view.frame.size.width, 
                                        recognizer.view.frame.size.height);
     
-    
-    
+
     [self isOnPeerIphone:touchPoint];
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
@@ -980,7 +982,7 @@ int PANNED_CARD_IDX = -1;
 
 - (void)swipeCloseCardsWithDirection:(int)dir
 {
-    float separationVal = 30.0;
+    float separationVal = 20.0;
     int i=0;
     
     if(dir == 0)
@@ -1037,22 +1039,7 @@ int PANNED_CARD_IDX = -1;
     int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
    
     int CARD_COUNT = [self.cardContainerImgView.subviews count];
-    
-    
-    NSMutableArray *cardTransformMutArray = [NSMutableArray array];
-    
-    for(int i=0; i < CARD_COUNT; i++)
-    {
-        UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-        CGPoint cardTranslationPoint = CGPointMake(imgView.transform.tx, imgView.transform.ty);
         
-        
-        
-        NSValue *cgPointValue = [NSValue valueWithCGPoint:cardTranslationPoint];
-        [cardTransformMutArray addObject:cgPointValue];
-    }    
-    
-    
     if(IS_CARD_CONTAINER_FACING_FRONT)
     {
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
@@ -1062,39 +1049,37 @@ int PANNED_CARD_IDX = -1;
         animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
     }
     
-    int CARD_TAG = -1;
+    
+    NSMutableArray *tempCurCardTagArray = [NSMutableArray array];
+    NSMutableArray *tempCurCardFrameArray = [NSMutableArray array];
     
     for(int i=0; i < CARD_COUNT; i++)
     {
         UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        [tempCurCardTagArray addObject:[NSNumber numberWithInt:curCardImgView.tag]];
+        [tempCurCardFrameArray addObject:[NSValue valueWithCGRect:curCardImgView.frame]];
+    }
+    
+    for(int i=0; i < CARD_COUNT; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        NSNumber *storedTagNumber = (NSNumber *)[tempCurCardTagArray objectAtIndex:(CARD_COUNT - 1) - i];
+        NSValue *storedFrameValue = (NSValue *)[tempCurCardFrameArray objectAtIndex:(CARD_COUNT - 1) - i];
+        
+        int storedCardTag = [storedTagNumber intValue];
+        
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:storedCardTag];
                 
-        //curCardImgView.transform = CGAffineTransformMakeTranslation(-curCardImgView.transform.tx, curCardImgView.transform.ty);
+        CGRect storedFrame = [storedFrameValue CGRectValue];
+        CGRect modifiedStoredFrame = CGRectMake(900 - storedFrame.origin.x, 
+                                                storedFrame.origin.y, 
+                                                storedFrame.size.width, 
+                                                storedFrame.size.height);
         
-        float cardCenterDeltaMoveX = curCardImgView.center.x - self.cardContainerImgView.center.x;
+        curCardImgView.frame = modifiedStoredFrame;
+        curCardImgView.tag = storedCardTag;
         
-        /*
-        curCardImgView.frame = CGRectMake(-cardCenterDeltaMoveX, 
-                                          curCardImgView.frame.origin.y, 
-                                          curCardImgView.frame.size.width, 
-                                          curCardImgView.frame.size.height);
-         */
-        
-        //curCardImgView.center = CGPointMake(curCardImgView.center.x - (cardCenterDeltaMoveX * 2), curCardImgView.center.y);
-       
-        
-        if(i == (CARD_COUNT - 2))
-        {
-            NSLog(@"card:%d, cardCenterDeltaMoveX: %f", i, cardCenterDeltaMoveX);
-            //NSLog(@"card %d frame x:%f, y:%f", i, curCardImgView.frame.origin.x, curCardImgView.frame.origin.y);
-            //NSLog(@"card center: x:%f, y:%f", curCardImgView.center.x, curCardImgView.center.y);
-            
-            //NSLog(@"card: %d, transform tx:%f, ty:%f", i, curCardImgView.transform.tx, curCardImgView.transform.ty);
-        }
-        
-        CARD_TAG = curCardImgView.tag;
-                
-        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:CARD_TAG];
-        
+    
         if(theCard.isFacingUp)
         {
             curCardImgView.image = self.backsideImage;
@@ -1105,6 +1090,8 @@ int PANNED_CARD_IDX = -1;
             curCardImgView.image = theCard.cardImage;
             theCard.isFacingUp = TRUE;
         }
+
+        NSLog(@"===============");
     }   
     
     
@@ -1367,6 +1354,30 @@ int PANNED_CARD_IDX = -1;
     } completion:^(BOOL finished) {
         
     }];    
+}
+
+- (IBAction)disclaimerIpadBtnPressed:(id)sender
+{
+    if(! self.disclaimerVC_iPad)
+    {
+        DisclaimerViewController_iPad *tempDisclaimerVC = [[DisclaimerViewController_iPad alloc]
+                                                           initWithNibName:@"DisclaimerViewController_iPad" bundle:nil];
+        
+        self.disclaimerVC_iPad = tempDisclaimerVC;
+        
+        [tempDisclaimerVC release];
+    }
+    
+    self.disclaimerVC_iPad.view.frame = CGRectMake(0, 768, 1024, 768);
+    [self.view addSubview:self.disclaimerVC_iPad.view];
+    
+    [UIView animateWithDuration:0.5 delay:0 options:UIViewAnimationCurveEaseInOut animations:^(void) {
+        
+        self.disclaimerVC_iPad.view.frame = CGRectMake(0, 0, 1024, 768);
+        
+    } completion:^(BOOL finished) {
+        
+    }];
 }
 
 @end

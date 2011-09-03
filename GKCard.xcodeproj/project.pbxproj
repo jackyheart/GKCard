@@ -14,6 +14,8 @@
 		CD3DA5B513A7A51000AFB54C /* SBJsonBase.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3DA5AD13A7A51000AFB54C /* SBJsonBase.m */; };
 		CD3DA5B613A7A51000AFB54C /* SBJsonParser.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3DA5AF13A7A51000AFB54C /* SBJsonParser.m */; };
 		CD3DA5B713A7A51000AFB54C /* SBJsonWriter.m in Sources */ = {isa = PBXBuildFile; fileRef = CD3DA5B113A7A51000AFB54C /* SBJsonWriter.m */; };
+		CD95F2F81411F73E00C42D70 /* DisclaimerViewController_iPad.m in Sources */ = {isa = PBXBuildFile; fileRef = CD95F2F61411F73E00C42D70 /* DisclaimerViewController_iPad.m */; };
+		CD95F2F91411F73E00C42D70 /* DisclaimerViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = CD95F2F71411F73E00C42D70 /* DisclaimerViewController_iPad.xib */; };
 		CD9E40D813A33B9300256BFF /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D713A33B9300256BFF /* UIKit.framework */; };
 		CD9E40DA13A33B9300256BFF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40D913A33B9300256BFF /* Foundation.framework */; };
 		CD9E40DC13A33B9300256BFF /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD9E40DB13A33B9300256BFF /* CoreGraphics.framework */; };
@@ -121,6 +123,9 @@
 		CD3DA5AF13A7A51000AFB54C /* SBJsonParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonParser.m; sourceTree = "<group>"; };
 		CD3DA5B013A7A51000AFB54C /* SBJsonWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJsonWriter.h; sourceTree = "<group>"; };
 		CD3DA5B113A7A51000AFB54C /* SBJsonWriter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJsonWriter.m; sourceTree = "<group>"; };
+		CD95F2F51411F73E00C42D70 /* DisclaimerViewController_iPad.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = DisclaimerViewController_iPad.h; path = iPad/DisclaimerViewController_iPad.h; sourceTree = "<group>"; };
+		CD95F2F61411F73E00C42D70 /* DisclaimerViewController_iPad.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = DisclaimerViewController_iPad.m; path = iPad/DisclaimerViewController_iPad.m; sourceTree = "<group>"; };
+		CD95F2F71411F73E00C42D70 /* DisclaimerViewController_iPad.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = DisclaimerViewController_iPad.xib; path = iPad/DisclaimerViewController_iPad.xib; sourceTree = "<group>"; };
 		CD9E40D313A33B9300256BFF /* GKCard.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = GKCard.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CD9E40D713A33B9300256BFF /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		CD9E40D913A33B9300256BFF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -349,6 +354,9 @@
 				CDEC519213B0E1A500E5FFD3 /* PeerIphoneViewController.h */,
 				CDEC519313B0E1A500E5FFD3 /* PeerIphoneViewController.m */,
 				CDEC519413B0E1A500E5FFD3 /* PeerIphoneViewController.xib */,
+				CD95F2F51411F73E00C42D70 /* DisclaimerViewController_iPad.h */,
+				CD95F2F61411F73E00C42D70 /* DisclaimerViewController_iPad.m */,
+				CD95F2F71411F73E00C42D70 /* DisclaimerViewController_iPad.xib */,
 			);
 			name = iPad;
 			sourceTree = "<group>";
@@ -598,6 +606,7 @@
 				CDF6704E13C0A08A008DA83E /* spade_k.png in Resources */,
 				CDF6704F13C0A08A008DA83E /* spade_q.png in Resources */,
 				CDF6705213C0A442008DA83E /* Icon.png in Resources */,
+				CD95F2F91411F73E00C42D70 /* DisclaimerViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -624,6 +633,7 @@
 				CD3DA5B713A7A51000AFB54C /* SBJsonWriter.m in Sources */,
 				CDFFC8C013ADD446003F3C31 /* Card.m in Sources */,
 				CDEC519513B0E1A500E5FFD3 /* PeerIphoneViewController.m in Sources */,
+				CD95F2F81411F73E00C42D70 /* DisclaimerViewController_iPad.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -661,8 +671,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: joe ow (2Z2NH6X35X)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: joe ow (2Z2NH6X35X)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_OPTIMIZATION_LEVEL = 0;
 				GCC_PREPROCESSOR_DEFINITIONS = DEBUG;
@@ -670,9 +680,9 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
-				PROVISIONING_PROFILE = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -682,16 +692,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CODE_SIGN_IDENTITY = "iPhone Developer: joe ow (2Z2NH6X35X)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: joe ow (2Z2NH6X35X)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
-				PROVISIONING_PROFILE = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
-				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -701,14 +711,17 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: joe ow (2Z2NH6X35X)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GKCard/GKCard-Prefix.pch";
 				INFOPLIST_FILE = "GKCard/GKCard-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				WRAPPER_EXTENSION = app;
 			};
 			name = Debug;
@@ -717,13 +730,16 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
-				CODE_SIGN_IDENTITY = "iPhone Developer: joe ow (2Z2NH6X35X)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = YES;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = "GKCard/GKCard-Prefix.pch";
 				INFOPLIST_FILE = "GKCard/GKCard-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.2;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "847736FA-8696-4791-97C7-6AB8AE3A2A03";
+				PROVISIONING_PROFILE = "";
+				"PROVISIONING_PROFILE[sdk=iphoneos*]" = "";
 				VALIDATE_PRODUCT = YES;
 				WRAPPER_EXTENSION = app;
 			};

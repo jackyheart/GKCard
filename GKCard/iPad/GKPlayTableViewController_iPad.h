@@ -10,6 +10,8 @@
 #import <GameKit/GameKit.h>
 #import "SBJSON.h"
 
+@class DisclaimerViewController_iPad;
+
 @interface GKPlayTableViewController_iPad : UIViewController
 <GKSessionDelegate, GKPeerPickerControllerDelegate> {
     
@@ -39,6 +41,8 @@
     
     //for testing
     @private NSMutableArray *sentOutCardMutArray;
+    
+    @private DisclaimerViewController_iPad *disclaimerVC_iPad;
 }
 
 @property (nonatomic, retain) UILabel *numCardsLabel;
@@ -55,6 +59,7 @@
 @property (nonatomic, retain) GKSession *currentSession;
 @property (nonatomic, retain) SBJSON *sbJSON;
 @property (nonatomic, retain) NSMutableArray *sentOutCardMutArray;
+@property (nonatomic, retain) DisclaimerViewController_iPad *disclaimerVC_iPad;
 
 - (void)startBluetooth;
 - (IBAction)flipBtnPressed:(id)sender;
@@ -65,5 +70,6 @@
 - (IBAction)dismissCardOrderView:(id)sender;
 - (IBAction)shuffleBtnTapped:(id)sender;
 - (IBAction)connectBtnPressed:(id)sender;
+- (IBAction)disclaimerIpadBtnPressed:(id)sender;
 
 @end
