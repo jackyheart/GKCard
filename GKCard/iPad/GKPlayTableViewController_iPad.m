@@ -583,10 +583,34 @@ int PANNED_CARD_IDX = -1;
 
 - (void)updateSmallCardContainer
 {
+    int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    
+    if(IS_CARD_CONTAINER_FACING_FRONT)
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    }
+    else 
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+    }     
+    
     //clears existing view
     for(UIView *v in self.smallCardContainerImgView.subviews)
     {
-        [v removeFromSuperview];
+        [UIView transitionWithView:v
+                          duration:0.8
+                           options:animationOptionIdx
+                        animations:^{ 
+                            
+                        }
+         
+                        completion:^(BOOL finished) {
+                        
+                        
+                            [v removeFromSuperview];
+                        }]; 
+        
+        
     }
     
     int itemCounter = [self.cardContainerImgView.subviews count] - 1;
@@ -598,7 +622,7 @@ int PANNED_CARD_IDX = -1;
     for(int i=0; i < 4; i++)
     {
         for(int j=0; j < 13; j++)
-        {
+        {            
             UIImageView *curCardImgView = [self.cardContainerImgView.subviews objectAtIndex:itemCounter];
             UIImage *cardImage = curCardImgView.image;
             
@@ -1113,6 +1137,9 @@ int PANNED_CARD_IDX = -1;
                         {
                             IS_CARD_CONTAINER_FACING_FRONT = TRUE;
                         }   
+                        
+                        //update card order container
+                        [self updateSmallCardContainer];
                         
                     }];
  
