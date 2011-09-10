@@ -284,7 +284,16 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         self.cardNameLabel.text = [NSString stringWithFormat:@"Card: %@", cardObject.cardName];
     }
     
-    recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
+    CGAffineTransform newTranslation = CGAffineTransformMakeTranslation(translation.x, translation.y);
+    //CGAffineTransform rotateToStraight = CGAffineTransformMakeRotation(RADIANS(0));
+    
+    //CGAffineTransform newTransform = CGAffineTransformConcat(newTranslation, rotateToStraight);
+    //CGAffineTransform combinedTransform = CGAffineTransformConcat(newTransform, CARD_INITIAL_TRANSFORM);
+    
+    recognizer.view.transform = newTranslation;
+    
+    //recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
+
     
     [self isOnBluetoothArrow:touchPoint];
     
@@ -296,12 +305,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         {
             NSLog(@"send out card to ipad");
             
-            [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
+            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationOptionCurveLinear 
                              animations:^(void) {
                                  
                                  self.bluetoothOverlayImgView.alpha = 0.0;
                                  
-                                 recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -200.0);                                 
+                                 recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -300.0);                                 
                                  
                              } completion:^(BOOL finished) {
                                  
@@ -738,6 +747,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     int CARD_COUNT = [self.cardContainerImgView.subviews count];
     
+    /*
     if(IS_CARD_CONTAINER_FACING_FRONT)
     {
         //flip card index
@@ -802,6 +812,74 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
                         
                     }];
      
+     */
+    
+    
+    if(IS_CARD_CONTAINER_FACING_FRONT)
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    }
+    else 
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+    }
+    
+    
+    NSMutableArray *tempCurCardTagArray = [NSMutableArray array];
+    NSMutableArray *tempCurCardFrameArray = [NSMutableArray array];
+
+    for(int i=0; i < CARD_COUNT; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        [tempCurCardTagArray addObject:[NSNumber numberWithInt:curCardImgView.tag]];
+        [tempCurCardFrameArray addObject:[NSValue valueWithCGRect:curCardImgView.frame]];
+    }
+    
+    
+    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        
+        NSNumber *storedTagNumber = (NSNumber *)[tempCurCardTagArray objectAtIndex:(CARD_COUNT - 1) - i];
+        int storedCardTag = [storedTagNumber intValue];
+        
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:storedCardTag];
+        curCardImgView.tag = storedCardTag;
+        
+        if(theCard.isFacingUp)
+        {
+            curCardImgView.image = self.backsideImage;
+            theCard.isFacingUp = FALSE;
+        }
+        else
+        {
+            curCardImgView.image = theCard.cardImage;
+            theCard.isFacingUp = TRUE;
+        }
+    }   
+    
+    
+    [UIView transitionWithView:self.cardContainerImgView
+                      duration:0.8
+                       options:animationOptionIdx
+                    animations:^{ 
+                        
+                    }
+     
+                    completion:^(BOOL finished) {
+                        
+                        if(IS_CARD_CONTAINER_FACING_FRONT)
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
+                            
+                        }
+                        else
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
+                        }   
+                        
+                    }];  
+     
 }
 
 - (IBAction)disconnectBtnPressed:(id)sender
@@ -827,6 +905,15 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     NSLog(@"rand cardIdx:%d", cardIdx);
     
     [self processReceivedCardWithCardIdx:cardIdx andCardFacing:TRUE];
+    
+    if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+    {
+        [self swipeOpenCardsWithDirection:0];
+    }
+    else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+    {
+        [self swipeOpenCardsWithDirection:1];
+    }
 }
 
 @end
