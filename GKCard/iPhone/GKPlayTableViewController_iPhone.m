@@ -821,7 +821,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 
 - (IBAction)testBtnPressed:(id)sender
 {
-    int cardIdx = rand() % 52;
+    int cardIdx = arc4random() % 52;
     
     
     NSLog(@"rand cardIdx:%d", cardIdx);
