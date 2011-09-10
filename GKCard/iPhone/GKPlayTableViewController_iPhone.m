@@ -29,6 +29,7 @@ typedef enum {
 - (void)swipeCloseCards;
 - (BOOL)isOnBluetoothArrow:(CGPoint)touchPoint;
 - (void)updateNumOfCards;
+- (void)processReceivedCardWithCardIdx:(int)cardIdx andCardFacing:(BOOL)cardFacing;
 
 @end
 
@@ -343,7 +344,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         {
             [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
                 
-                [self swipeOpenCardsWithDirection:0];
+                [self swipeOpenCardsWithDirection:1];
                 
             } completion:NULL];
         }
@@ -364,7 +365,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         {
             [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
                 
-                [self swipeOpenCardsWithDirection:1];
+                [self swipeOpenCardsWithDirection:0];
                 
             } completion:NULL];          
         }
@@ -494,82 +495,92 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         {
             int cardIdx = [[objectDict objectForKey:@"cardIndex"] intValue];
             BOOL cardFacing = [[objectDict objectForKey:@"cardFacing"] boolValue];
-            
-            Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
-            theCard.isFacingUp = cardFacing;
-            UIImage *cardImage = theCard.cardImage;
-            
-            if(! cardFacing)
-            {
-                cardImage = self.backsideImage;
-            }
-            
-            
-            UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
-            
-            cardImgView.userInteractionEnabled = YES;
-            cardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
-            cardImgView.frame = CGRectMake(0, 
-                                           -20, 
-                                           cardImage.size.width, 
-                                           cardImage.size.height);
-            cardImgView.tag = cardIdx;//tag the card
-            
-            
-            //=== single tap gesture
-            UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
-            
-            singleTapRecognizer.numberOfTouchesRequired = 1;
-            singleTapRecognizer.numberOfTapsRequired = 1;
-            
-            [cardImgView addGestureRecognizer:singleTapRecognizer];
-            
-            [singleTapRecognizer release];
-            
-            
-            //=== double tap gesture
-            UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
-            
-            //double tap
-            doubleTapRecognizer.numberOfTouchesRequired = 1;
-            doubleTapRecognizer.numberOfTapsRequired = 2;
-            
-            [cardImgView addGestureRecognizer:doubleTapRecognizer];
-            
-            [doubleTapRecognizer release];  
-            
-            
-            //add pan gesture recognizer
-            UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
-            
-            [cardImgView addGestureRecognizer:panRecognizer]; 
-            
-            [panRecognizer release];    
-            
-            
-            //add to the array
-            [self.cardContainerImgView addSubview:cardImgView]; 
-            
 
-            
-            [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
-                
-                cardImgView.center = CGPointMake(cardImgView.center.x,
-                                                 cardContainerImgView.center.y);
-                
-            } completion:^(BOOL finished) {
-                
-            }];
-            
-            
-            [cardImgView release];
-      
+            [self processReceivedCardWithCardIdx:cardIdx andCardFacing:cardFacing];
         }
     }
     
     [dataStr release];    
 }
 
+
+- (void)processReceivedCardWithCardIdx:(int)cardIdx andCardFacing:(BOOL)cardFacing
+{
+    Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
+    theCard.isFacingUp = cardFacing;
+    UIImage *cardImage = theCard.cardImage;
+    
+    if(! cardFacing)
+    {
+        cardImage = self.backsideImage;
+    }
+    
+    
+    UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+    
+    cardImgView.userInteractionEnabled = YES;
+    cardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+    cardImgView.frame = CGRectMake(0, 
+                                   -20, 
+                                   cardImage.size.width, 
+                                   cardImage.size.height); 
+
+    cardImgView.tag = cardIdx;//tag the card
+    
+    
+    //=== single tap gesture
+    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+    
+    singleTapRecognizer.numberOfTouchesRequired = 1;
+    singleTapRecognizer.numberOfTapsRequired = 1;
+    
+    [cardImgView addGestureRecognizer:singleTapRecognizer];
+    
+    [singleTapRecognizer release];
+    
+    
+    //=== double tap gesture
+    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+    
+    //double tap
+    doubleTapRecognizer.numberOfTouchesRequired = 1;
+    doubleTapRecognizer.numberOfTapsRequired = 2;
+    
+    [cardImgView addGestureRecognizer:doubleTapRecognizer];
+    
+    [doubleTapRecognizer release];  
+    
+    
+    //add pan gesture recognizer
+    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+    
+    [cardImgView addGestureRecognizer:panRecognizer]; 
+    
+    [panRecognizer release];    
+    
+    
+    //add to the array
+    [self.cardContainerImgView addSubview:cardImgView]; 
+    
+    cardImgView.center = CGPointMake(self.cardContainerImgView.center.x, 
+                                     self.cardContainerImgView.center.y - 300);
+    
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+        
+        cardImgView.center = CGPointMake(self.cardContainerImgView.center.x,
+                                         self.cardContainerImgView.center.y + 65);
+        
+    } completion:^(BOOL finished) {
+        
+    }];
+    
+    
+    [cardImgView release];
+    
+    [self updateNumOfCards];
+    
+}
 
 
 #pragma mark - App logic
@@ -634,13 +645,13 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     {
         //left
         BASE_INCR = 5.0;
-        CUR_CARD_STACK_STATUS = CARD_EXPANDED_LEFT;
+        CUR_CARD_STACK_STATUS = CARD_EXPANDED_RIGHT;
     }
     else
     {
         //right
         BASE_INCR = -5.0;
-        CUR_CARD_STACK_STATUS = CARD_EXPANDED_RIGHT;
+        CUR_CARD_STACK_STATUS = CARD_EXPANDED_LEFT;
     }
 
     float BASE_START = -(BASE_INCR) * middleIndexRounded;//increment of 15 degrees * number of cards (converted index)
@@ -808,5 +819,14 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     [self startBluetooth];
 }
 
+- (IBAction)testBtnPressed:(id)sender
+{
+    int cardIdx = rand() % 52;
+    
+    
+    NSLog(@"rand cardIdx:%d", cardIdx);
+    
+    [self processReceivedCardWithCardIdx:cardIdx andCardFacing:TRUE];
+}
 
 @end

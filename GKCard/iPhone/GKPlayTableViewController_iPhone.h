@@ -54,5 +54,6 @@
 - (void)startBluetooth;
 - (IBAction)flipBtnPressed:(id)sender;
 - (IBAction)disconnectBtnPressed:(id)sender;
+- (IBAction)testBtnPressed:(id)sender;
 
 @end
