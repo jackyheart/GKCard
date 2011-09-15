@@ -977,9 +977,11 @@ int PANNED_CARD_IDX = -1;
 
 - (void)swipeOpenCardsWithDirection:(int)dir
 {
-    float separationVal = 30.0;
+    float separationVal = 15.0;
     
     int i=0;
+    
+    NSLog(@"dir: %d", dir);
     
     if(dir == 0)
     {
@@ -1006,8 +1008,10 @@ int PANNED_CARD_IDX = -1;
 
 - (void)swipeCloseCardsWithDirection:(int)dir
 {
-    float separationVal = 20.0;
+    float separationVal = 15.0;
     int i=0;
+    
+    NSLog(@"dir: %d", dir);
     
     if(dir == 0)
     {
