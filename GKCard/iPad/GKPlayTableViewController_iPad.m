@@ -26,10 +26,10 @@ typedef enum {
 
 @interface GKPlayTableViewController_iPad (private)
 
-- (void)sendCardToIPhoneWithIndex:(int)cardIdx;
+- (void)sendCardToIPhoneWithIndex:(int)cardIdx withPeerPhoneIdx:(int)peerIdx;
 - (void)swipeOpenCardsWithDirection:(int)dir;
 - (void)swipeCloseCardsWithDirection:(int)dir;
-- (BOOL)isOnPeerIphone:(CGPoint)touchPoint;
+- (int)isOnPeerIphone:(CGPoint)touchPoint;
 - (void)updateNumOfCards;
 - (int)getPannedCardIdxWithCardTag:(int)cardTag;
 - (void)hoverSmallCardsWithTouchPoint:(CGPoint)touchPoint;
@@ -382,9 +382,9 @@ CGPoint touchDelta;
     {   
         CUR_CARD_STACK_STATUS = CARD_STACK_UNDEFINED;
         
-        BOOL isOnIphone = [self isOnPeerIphone:touchPoint];
+        int peerPhoneIdx = [self isOnPeerIphone:touchPoint];
         
-        if(isOnIphone)
+        if(peerPhoneIdx >= 0)
         {
             NSLog(@"send out card to iphone");
             
@@ -419,7 +419,7 @@ CGPoint touchDelta;
                                  
                                  [self updateNumOfCards];   
                                  
-                                 [self sendCardToIPhoneWithIndex:recognizer.view.tag];
+                                 [self sendCardToIPhoneWithIndex:recognizer.view.tag withPeerPhoneIdx:peerPhoneIdx];
                                  
                              }];
         }
@@ -716,6 +716,16 @@ int PANNED_CARD_IDX = -1;
     
     NSLog(@"[in iPad], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
     
+    NSLog(@"[in iPad] peer count: %d", [self.peerIdMutArray count]);
+    
+    NSLog(@"list of peers:");
+    
+    for(int i=0; i < [self.peerIdMutArray count]; i++)
+    {
+        NSString *str = [self.peerIdMutArray objectAtIndex:i];
+        NSLog(@"peer %d: %@", i, str);
+    }  
+    
     
     for(int i=0; i < [self.peerIdMutArray count]; i++)
     {
@@ -932,7 +942,7 @@ int PANNED_CARD_IDX = -1;
     [picker show];   
 }
 
-- (void)sendCardToIPhoneWithIndex:(int)cardIdx
+- (void)sendCardToIPhoneWithIndex:(int)cardIdx withPeerPhoneIdx:(int)peerIdx
 {
     if(self.currentSession)
     {                  
@@ -959,7 +969,18 @@ int PANNED_CARD_IDX = -1;
             NSLog(@"json string to send out: %@", jsonString);
             
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-            NSArray *iphoneTableArray = (NSArray *)self.peerIdMutArray;
+            
+            NSString *peerIdString = (NSString *)[self.peerIdMutArray objectAtIndex:peerIdx];
+            
+            NSLog(@"list of peers:");
+            
+            for(int i=0; i < [self.peerIdMutArray count]; i++)
+            {
+                NSString *str = [self.peerIdMutArray objectAtIndex:i];
+                NSLog(@"peer %d: %@", i, str);
+            }
+            
+            NSArray *iphoneTableArray = [NSArray arrayWithObjects:peerIdString, nil];
             
             NSLog(@"[in iPad] peer tbl array to send: %@", iphoneTableArray);
             
@@ -1033,9 +1054,9 @@ int PANNED_CARD_IDX = -1;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
 }
 
-- (BOOL)isOnPeerIphone:(CGPoint)touchPoint
+- (int)isOnPeerIphone:(CGPoint)touchPoint
 {
-    BOOL isOnIphone = FALSE;
+    int peerPhoneIdx = -1;
     
     for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
     {
@@ -1043,7 +1064,7 @@ int PANNED_CARD_IDX = -1;
         
         if(CGRectContainsPoint(peerIphoneVC.view.frame, touchPoint))
         {
-            isOnIphone = TRUE;
+            peerPhoneIdx = i;
             peerIphoneVC.view.backgroundColor = [UIColor colorWithWhite:0.0 alpha:0.8];
             break;
         }
@@ -1053,7 +1074,7 @@ int PANNED_CARD_IDX = -1;
         }
     }
     
-    return isOnIphone;
+    return peerPhoneIdx;
 }
 
 - (void)updateNumOfCards

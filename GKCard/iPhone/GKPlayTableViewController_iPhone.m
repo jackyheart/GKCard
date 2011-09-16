@@ -582,6 +582,16 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         
     } completion:^(BOOL finished) {
         
+        
+        if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+        {
+            [self swipeOpenCardsWithDirection:0];
+        }
+        else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+        {
+            [self swipeOpenCardsWithDirection:1];
+        }   
+        
     }];
     
     
