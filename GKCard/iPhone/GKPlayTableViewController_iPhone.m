@@ -1049,7 +1049,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
         if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
         {
             //swipe open right by default
-            [self swipeOpenCardsWithDirection:1];
+            [self swipeOpenCardsWithDirection:0];
         }
         else
         {
