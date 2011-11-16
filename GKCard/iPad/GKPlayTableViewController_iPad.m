@@ -23,9 +23,18 @@ typedef enum {
 
 } CARD_STACK_STATUS;
 
+// GameKit Session ID for app
+#define kSessionID @"GKCard"
+
+#define MAX_DEVICES 4
+
+#define kALERT_CONNECT_CONFIRMATION 0
 
 @interface GKPlayTableViewController_iPad (private)
 
+- (void)invalidateSession:(GKSession *)session;
+- (void)printOutDescriptionAndSolutionOfError:(NSError *)error;
+- (void)updateUIonNewlyConnectedPeer:(NSString *)peerID;
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx withPeerPhoneIdx:(int)peerIdx;
 - (void)swipeOpenCardsWithDirection:(int)dir;
 - (void)swipeCloseCardsWithDirection:(int)dir;
@@ -157,7 +166,7 @@ float CARD_HEIGHT = 261.0;
         
         curCardImgView.frame = CGRectMake(0, 0, CARD_WIDTH, CARD_HEIGHT);
         curCardImgView.center = CGPointMake(self.cardContainerImgView.center.x, 
-                                            self.cardContainerImgView.center.y);
+                                            self.cardContainerImgView.center.y + 50);
 
         
         curCardImgView.tag = i;//tag the card
@@ -196,7 +205,7 @@ float CARD_HEIGHT = 261.0;
         panRecognizer.maximumNumberOfTouches = 1;
         [curCardImgView addGestureRecognizer:panRecognizer]; 
         
-        [panRecognizer release];    
+        [panRecognizer release];
         
         
         //add to the array
@@ -246,13 +255,14 @@ float CARD_HEIGHT = 261.0;
     //=== allocate peerIphoneVC
     self.peerIphoneVCMutArray = [NSMutableArray array];
     
-    for(int i=0; i < 4; i++)
+    for(int i=0; i < MAX_DEVICES; i++)
     {
         PeerIphoneViewController *peerIphoneVC = [[PeerIphoneViewController alloc]
                                                   initWithNibName:@"PeerIphoneViewController" bundle:nil];
         
         peerIphoneVC.view.frame = CGRectMake(i * 200 + 150, 30, peerIphoneVC.view.frame.size.width, peerIphoneVC.view.frame.size.height);
         peerIphoneVC.view.alpha = 0.6;
+        peerIphoneVC.IS_CONNECTED = NO;
         
         [self.peerIphoneVCMutArray addObject:peerIphoneVC];
         [self.view addSubview:peerIphoneVC.view];
@@ -278,6 +288,7 @@ float CARD_HEIGHT = 261.0;
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = TRUE;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
+    REMOTE_ATTEMPT_PEER_ID = @"";
     
     
     //=== for testing
@@ -348,35 +359,31 @@ float CARD_HEIGHT = 261.0;
 }
 
 CGPoint touchDelta;
+CGRect cardStartFrame;
 
 - (void)panGestureHandler:(UIPanGestureRecognizer *)recognizer {
     
     CGPoint touchPoint = [recognizer locationInView:self.view];    
-    //CGPoint translation = [recognizer translationInView:self.view];
-        
-    //NSLog(@"panHandler minimumNum touches: %d", recognizer.minimumNumberOfTouches);
     
     if(recognizer.state == UIGestureRecognizerStateBegan)
     {   
         Card *cardObject = (Card*)[self.cardObjectMutArray objectAtIndex:recognizer.view.tag];
         self.cardNameLabel.text = cardObject.cardName;
-        
-        //netTranslation = CGPointMake(recognizer.view.transform.tx, recognizer.view.transform.ty);
-    
+            
         touchDelta = CGPointMake(touchPoint.x - recognizer.view.frame.origin.x, 
                                  touchPoint.y - recognizer.view.frame.origin.y);
+        
+        cardStartFrame = recognizer.view.frame;
     }
-    
-   // recognizer.view.transform = CGAffineTransformMakeTranslation(netTranslation.x + translation.x, netTranslation.y + translation.y);
-     
 
     recognizer.view.frame = CGRectMake(touchPoint.x - touchDelta.x, 
                                        touchPoint.y - touchDelta.y, 
                                        recognizer.view.frame.size.width, 
                                        recognizer.view.frame.size.height);
     
-
+    //highlight
     [self isOnPeerIphone:touchPoint];
+    
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
     {   
@@ -388,42 +395,67 @@ CGPoint touchDelta;
         {
             NSLog(@"send out card to iphone");
             
-            [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
-                             animations:^(void) {
-                                 
-                                 recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -200.0);                                 
-                                 
-                             } completion:^(BOOL finished) {
-                                 
-                                 //for main card stack
-                                 for(UIView *v in self.cardContainerImgView.subviews)
-                                 {
-                                     if(v.tag == recognizer.view.tag)
+            PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:peerPhoneIdx];
+            
+            if(peerVC.IS_CONNECTED)
+            {
+                [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationOptionCurveLinear 
+                                 animations:^(void) {
+                                     
+                                     recognizer.view.transform = CGAffineTransformTranslate(recognizer.view.transform, 0.0, -200.0);                                 
+                                     
+                                 } completion:^(BOOL finished) {
+                                     
+                                     //for main card stack
+                                     for(UIView *v in self.cardContainerImgView.subviews)
                                      {
-                                         [v removeFromSuperview];
+                                         if(v.tag == recognizer.view.tag)
+                                         {
+                                             [v removeFromSuperview];
+                                         }
                                      }
-                                 }
-                                 
-                                 //for card order view
-                                 for(UIView *v in self.smallCardContainerImgView.subviews)
-                                 {
-                                     if(v.tag == recognizer.view.tag)
+                                     
+                                     //for card order view
+                                     for(UIView *v in self.smallCardContainerImgView.subviews)
                                      {
-                                         //v.tag = -1;
-                                         //UIImageView *imgView = (UIImageView *)v;
-                                         //imgView.image = nil;
-                                         
-                                         [v removeFromSuperview];
-                                     }
-                                 }  
-                                 
-                                 [self updateNumOfCards];   
-                                 
-                                 [self sendCardToIPhoneWithIndex:recognizer.view.tag withPeerPhoneIdx:peerPhoneIdx];
-                                 
-                             }];
+                                         if(v.tag == recognizer.view.tag)
+                                         {
+                                             //v.tag = -1;
+                                             //UIImageView *imgView = (UIImageView *)v;
+                                             //imgView.image = nil;
+                                             
+                                             [v removeFromSuperview];
+                                         }
+                                     }  
+                                     
+                                     [self updateNumOfCards];   
+                                     
+                                     [self sendCardToIPhoneWithIndex:recognizer.view.tag withPeerPhoneIdx:peerPhoneIdx];
+                                     
+                                 }];
+            }
+            else
+            {
+                //remove highlight
+                for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
+                {
+                    PeerIphoneViewController *peerIphoneVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
+                    
+                    peerIphoneVC.view.backgroundColor = [UIColor clearColor];
+                }
+
+                
+                //if not connected, animate back
+                
+                [UIView animateWithDuration:0.6 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+                    
+                    recognizer.view.frame = cardStartFrame;
+                    
+                } completion:^(BOOL finished) {
+                    
+                }];   
+            }
         }
-        
     }
 }
 
@@ -703,6 +735,8 @@ int PANNED_CARD_IDX = -1;
 }
 
 #pragma mark - Bluetooth delegates
+
+/*
 - (void)peerPickerController:(GKPeerPickerController *)pk didConnectPeer:(NSString *)peerID toSession:(GKSession *)session
 {
     self.currentSession = session;
@@ -718,12 +752,12 @@ int PANNED_CARD_IDX = -1;
     
     NSLog(@"[in iPad] peer count: %d", [self.peerIdMutArray count]);
     
-    NSLog(@"list of peers:");
+    NSLog(@"[in iPad] list of peers:");
     
     for(int i=0; i < [self.peerIdMutArray count]; i++)
     {
         NSString *str = [self.peerIdMutArray objectAtIndex:i];
-        NSLog(@"peer %d: %@", i, str);
+        NSLog(@"[in iPad] peer %d: %@", i, str);
     }  
     
     
@@ -778,21 +812,50 @@ int PANNED_CARD_IDX = -1;
     picker.delegate = nil;
     [picker autorelease];
 }
+ */
+
+- (void)session:(GKSession *)session didReceiveConnectionRequestFromPeer:(NSString *)peerID
+{
+    NSString *peerDisplayName = [session displayNameForPeer:peerID];
+        
+    REMOTE_ATTEMPT_PEER_ID = peerID;
+    
+    UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Connection request" message:[NSString stringWithFormat:@"Peer %@ requesting connection", peerDisplayName] delegate:self cancelButtonTitle:@"Accept" otherButtonTitles:@"Decline", nil];
+    alert.tag = kALERT_CONNECT_CONFIRMATION;
+    [alert show];
+    [alert release];
+}
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
 {
+    NSString *peerDisplayName = [session displayNameForPeer:peerID];
+    
     switch (state) {
+            
         case GKPeerStateConnected:
-            NSLog(@"[in iPad] peer is connected");
+            
+            NSLog(@"[in iPad] peer %@ is connected", peerDisplayName);
+            
+            //update UI
+            [self updateUIonNewlyConnectedPeer:peerID];
+            
             break;
+            
         case GKPeerStateDisconnected:
-            NSLog(@"[in iPad] peer is DISconnected");
+            NSLog(@"[in iPad] peer %@ is DISconnected", peerDisplayName);
+            
+            UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Disconnected" message:[NSString stringWithFormat:@"Peer %@ is disconnected", peerDisplayName] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+            [alert show];
+            [alert release];    
+            
             break;
+            
         case GKPeerStateAvailable:
-            NSLog(@"[in iPad] peer is available");
+            NSLog(@"[in iPad] peer %@ is available", peerDisplayName);
             break;
+            
         case GKPeerStateUnavailable:
-            NSLog(@"[in iPad] peer is UNavailable");
+            NSLog(@"[in iPad] peer %@ is UNavailable", peerDisplayName);
             break;
             
         default:
@@ -800,9 +863,24 @@ int PANNED_CARD_IDX = -1;
     }
 }
 
+- (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error
+{
+    NSLog(@"connection with peer %@ failed !", peerID);
+    
+    [self printOutDescriptionAndSolutionOfError:error];
+}
+
 - (void)session:(GKSession *)session didFailWithError:(NSError *)error
 {
+    NSLog(@"fatal error");
     
+    [session disconnectFromAllPeers];
+    session.available = NO;
+    [session setDataReceiveHandler: nil withContext: NULL]; 
+    session.delegate = nil;
+    session = nil;
+    
+    [self printOutDescriptionAndSolutionOfError:error];
 }
 
 - (void) receiveData:(NSData *)data fromPeer:(NSString *)peer inSession: (GKSession *)session context:(void *)context
@@ -931,15 +1009,138 @@ int PANNED_CARD_IDX = -1;
     [dataStr release];
 }
 
+#pragma mark - AlertView delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
+{
+    if(alertView.tag == kALERT_CONNECT_CONFIRMATION)
+    {
+        if(buttonIndex == 0)
+        {
+            //Accept
+            
+            if(! [REMOTE_ATTEMPT_PEER_ID isEqualToString:@""] && self.currentSession)
+            {
+                NSError *error = nil;
+                [self.currentSession acceptConnectionFromPeer:REMOTE_ATTEMPT_PEER_ID error:&error];
+                
+                if(error != nil)
+                {
+                    [self printOutDescriptionAndSolutionOfError:error];
+                }
+            }
+        }
+        else if(buttonIndex == 1)
+        {
+            //Decline
+            
+            if(! [REMOTE_ATTEMPT_PEER_ID isEqualToString:@""] && self.currentSession)
+            {
+                [self.currentSession denyConnectionFromPeer:REMOTE_ATTEMPT_PEER_ID];
+            }         
+        }
+    }
+}
+
 #pragma mark - App logic
 
 - (void)startBluetooth
 {
+    /*
     picker = [[GKPeerPickerController alloc] init];
     picker.delegate = self;
     picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
     
-    [picker show];   
+    [picker show];   */
+    
+    if(! self.currentSession)
+    {
+        NSString *deviceName = [[UIDevice currentDevice] name];
+        
+        GKSession *tempSession = [[GKSession alloc] initWithSessionID:kSessionID displayName:deviceName sessionMode:GKSessionModeServer];
+        
+        self.currentSession = tempSession;
+        self.currentSession.delegate = self;
+        self.currentSession.available = YES;
+        self.currentSession.disconnectTimeout = 0;
+        [self.currentSession setDataReceiveHandler:self withContext:nil];
+        
+        [tempSession release]; 
+        
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Session started" message:@"Server Session started !" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        
+        [alert show];
+        [alert release];     
+    }
+    else
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Session running" message:[NSString stringWithFormat:@"Server session id %@ and sessionName %@ is running", self.currentSession.sessionID, self.currentSession.displayName] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        
+        [alert show];
+        [alert release];        
+    }
+}
+
+#pragma mark - private method implementations
+
+- (void)invalidateSession:(GKSession *)session {
+    
+	if(session != nil) {
+        
+        [session disconnectFromAllPeers]; 
+		session.available = NO; 
+		[session setDataReceiveHandler: nil withContext: NULL]; 
+		session.delegate = nil; 
+	}
+}
+
+- (void)printOutDescriptionAndSolutionOfError:(NSError *)error
+{
+    NSLog(@"================");
+    
+    NSLog(@"error code: %d", error.code);
+    NSLog(@"description: %@", error.localizedDescription);
+    NSLog(@"failure reason: %@", error.localizedFailureReason);
+    
+    NSLog(@"recovery options:");
+    
+    for(int i=0; i < error.localizedRecoveryOptions.count; i++)
+    {
+        NSLog(@"- %@", [error.localizedRecoveryOptions objectAtIndex:i]);
+    }
+    
+    NSLog(@"recovery suggestion: %@", error.localizedRecoverySuggestion);
+}
+
+- (void)updateUIonNewlyConnectedPeer:(NSString *)peerID
+{
+    //add peerID to the mut array
+    [self.peerIdMutArray addObject:peerID];
+    
+    NSLog(@"[in iPad] peer count: %d", [self.peerIdMutArray count]);
+    
+    NSLog(@"[in iPad] list of peers:");
+    
+    for(int i=0; i < [self.peerIdMutArray count]; i++)
+    {
+        NSString *str = [self.peerIdMutArray objectAtIndex:i];
+        NSLog(@"[in iPad] peer %d: %@", i, str);
+    }  
+    
+    if(self.currentSession)
+    {
+        for(int i=0; i < [self.peerIdMutArray count]; i++)
+        {
+            NSString *curPeerID = [self.peerIdMutArray objectAtIndex:i];
+            
+            PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
+            peerVC.peerNameLabel.text = [self.currentSession displayNameForPeer:curPeerID];
+            peerVC.IS_CONNECTED = YES;
+            
+            peerVC.view.alpha = 1.0;
+        }      
+    }
 }
 
 - (void)sendCardToIPhoneWithIndex:(int)cardIdx withPeerPhoneIdx:(int)peerIdx
@@ -1171,11 +1372,12 @@ int PANNED_CARD_IDX = -1;
 }
 
 - (IBAction)disconnectBtnPressed:(id)sender
-{
-    //disconnect bluetooth
-    [self.currentSession disconnectFromAllPeers];
-    [self.currentSession release];
-    currentSession = nil;
+{    
+    if(self.currentSession)
+    {
+        [self invalidateSession:self.currentSession];
+        self.currentSession = nil;
+    }
     
     GKCardViewController_iPad *rootVC_ipad = APP_DELEGATE_IPAD.viewController;
     [APP_DELEGATE_IPAD transitionFromView:self.view toView:rootVC_ipad.view withDirection:0 fromDevice:@"iPad"];

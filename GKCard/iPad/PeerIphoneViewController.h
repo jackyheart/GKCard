@@ -15,5 +15,6 @@
 }
 
 @property (nonatomic, retain) UILabel *peerNameLabel;
+@property (nonatomic, assign) BOOL IS_CONNECTED;
 
 @end

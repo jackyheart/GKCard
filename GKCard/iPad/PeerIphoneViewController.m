@@ -12,6 +12,7 @@
 @implementation PeerIphoneViewController
 
 @synthesize peerNameLabel;
+@synthesize IS_CONNECTED;
 
 - (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
 {

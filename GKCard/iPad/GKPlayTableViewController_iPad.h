@@ -35,6 +35,7 @@
     //bluetooth
     @private GKSession *currentSession;
     @private GKPeerPickerController *picker;
+    @private NSString *REMOTE_ATTEMPT_PEER_ID;
 
     //JSON
     @private SBJSON *sbJSON;
