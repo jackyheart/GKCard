@@ -395,6 +395,14 @@ CGRect cardStartFrame;
         {
             NSLog(@"send out card to iphone");
             
+            //remove highlight
+            for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
+            {
+                PeerIphoneViewController *peerIphoneVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
+                
+                peerIphoneVC.view.backgroundColor = [UIColor clearColor];
+            }
+            
             PeerIphoneViewController *peerVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:peerPhoneIdx];
             
             if(peerVC.IS_CONNECTED)
@@ -436,14 +444,6 @@ CGRect cardStartFrame;
             }
             else
             {
-                //remove highlight
-                for(int i=0; i < [self.peerIphoneVCMutArray count]; i++)
-                {
-                    PeerIphoneViewController *peerIphoneVC = (PeerIphoneViewController *)[self.peerIphoneVCMutArray objectAtIndex:i];
-                    
-                    peerIphoneVC.view.backgroundColor = [UIColor clearColor];
-                }
-
                 
                 //if not connected, animate back
                 
