@@ -22,8 +22,17 @@ typedef enum {
     
 } CARD_STACK_STATUS;
 
+// GameKit Session ID for app
+#define kSessionID @"GKCard"
+
+#define kALERT_CONNECT_TO_MASTER_CONFIRMATION 0
+#define kALERT_DISCONNECT_CONFIRMATION 1
+
 @interface GKPlayTableViewController_iPhone (private)
 
+- (void)invalidateSession:(GKSession *)session;
+- (void)startBluetooth;
+- (void)printOutDescriptionAndSolutionOfError:(NSError *)error;
 - (void)sendCardToIPadWithIndex:(int)cardIdx;
 - (void)swipeOpenCardsWithDirection:(int)dir;
 - (void)swipeCloseCards;
@@ -216,6 +225,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     //=== set variables
     IS_CARD_CONTAINER_FACING_FRONT = YES;
     CUR_CARD_STACK_STATUS = CARD_FULLY_STACKED;
+    MASTER_PEER_ID = @"";
     
     //=== initialize peer id mutable array
     self.peerIdMutArray = [NSMutableArray array];
@@ -394,6 +404,8 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 }
 
 #pragma mark - Bluetooth delegates
+
+/*
 - (void)peerPickerController:(GKPeerPickerController *)pk didConnectPeer:(NSString *)peerID toSession:(GKSession *)session
 {
     self.currentSession = session;
@@ -406,6 +418,17 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     NSLog(@"[in iPhone] peer connected, my session mode: %d, session id:%@, session name:%@", session.sessionMode, session.sessionID, session.displayName);
     
     NSLog(@"[in iPhone], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
+    
+    
+    NSLog(@"[in iPhone] peer count: %d", [self.peerIdMutArray count]);
+    
+    NSLog(@"[in iPhone] list of peers:");
+    
+    for(int i=0; i < [self.peerIdMutArray count]; i++)
+    {
+        NSString *str = [self.peerIdMutArray objectAtIndex:i];
+        NSLog(@"[in iPhone] peer %d: %@", i, str);
+    }    
     
     if(self.currentSession)
     {                  
@@ -449,21 +472,75 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     picker.delegate = nil;
     [picker autorelease];
 }
+ */
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
 {
+    NSString *peerDisplayName = [session displayNameForPeer:peerID];
+    
     switch (state) {
         case GKPeerStateConnected:
-            NSLog(@"[in iPhone] peer is connected");
+            
+            NSLog(@"[in iPhone] peer %@ is connected", peerDisplayName);
+            
+            {
+                
+                //add peerID to the mut array
+                if(self.peerIdMutArray.count == 0)
+                {
+                    [self.peerIdMutArray addObject:peerID]; 
+                }
+                
+                NSLog(@"[in iPhone] peer count: %d", [self.peerIdMutArray count]);
+                
+                NSLog(@"[in iPhone] list of peers:");
+                
+                for(int i=0; i < [self.peerIdMutArray count]; i++)
+                {
+                    NSString *str = [self.peerIdMutArray objectAtIndex:i];
+                    NSLog(@"[in iPhone] peer %d: %@", i, str);
+                }      
+            }
+            
             break;
+            
         case GKPeerStateDisconnected:
-            NSLog(@"[in iPhone] peer is DISconnected");
+            NSLog(@"[in iPhone] peer %@ is DISconnected", peerDisplayName);
+            
+            {
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Disconnected" message:[NSString stringWithFormat:@"Server %@ is disconnected", peerDisplayName] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+                [alert show];
+                [alert release];    
+                
+                
+                //invalidate current session
+                if(self.currentSession)
+                {
+                    [self invalidateSession:self.currentSession];
+                    self.currentSession = nil;
+                    
+                    MASTER_PEER_ID = @"";
+                }
+            }
+            
             break;
+            
         case GKPeerStateAvailable:
-            NSLog(@"[in iPhone] peer is available");
+            NSLog(@"[in iPhone] peer %@ is available", peerDisplayName);
+            
+            {
+                MASTER_PEER_ID = peerID;
+                
+                UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Server found" message:[NSString stringWithFormat:@"Connect to server %@ ?", peerDisplayName] delegate:self cancelButtonTitle:@"YES" otherButtonTitles:@"NO", nil];
+                alert.tag = kALERT_CONNECT_TO_MASTER_CONFIRMATION;
+                [alert show];
+                [alert release];     
+            }
+            
             break;
+            
         case GKPeerStateUnavailable:
-            NSLog(@"[in iPhone] peer is UNavailable");
+            NSLog(@"[in iPhone] peer %@ is UNavailable", peerDisplayName);
             break;
             
         default:
@@ -471,9 +548,23 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     }
 }
 
+- (void)session:(GKSession *)session connectionWithPeerFailed:(NSString *)peerID withError:(NSError *)error
+{
+    NSLog(@"connection with peer %@ failed !", peerID);
+    
+    [self printOutDescriptionAndSolutionOfError:error];
+}
+
 - (void)session:(GKSession *)session didFailWithError:(NSError *)error
 {
+    NSLog(@"fatal error");
     
+    [session disconnectFromAllPeers];
+    session.available = NO;
+    [session setDataReceiveHandler: nil withContext: NULL]; 
+    session.delegate = nil;
+    
+    [self printOutDescriptionAndSolutionOfError:error];
 }
 
 - (void) receiveData:(NSData *)data fromPeer:(NSString *)peer inSession: (GKSession *)session context:(void *)context
@@ -513,104 +604,236 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 }
 
 
-- (void)processReceivedCardWithCardIdx:(int)cardIdx andCardFacing:(BOOL)cardFacing
+#pragma mark - Alert view delegate
+
+- (void)alertView:(UIAlertView *)alertView clickedButtonAtIndex:(NSInteger)buttonIndex
 {
-    Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
-    theCard.isFacingUp = cardFacing;
-    UIImage *cardImage = theCard.cardImage;
-    
-    if(! cardFacing)
+    if(alertView.tag == kALERT_CONNECT_TO_MASTER_CONFIRMATION)
     {
-        cardImage = self.backsideImage;
+        if(buttonIndex == 0)
+        {
+            //YES
+            
+            if(! [MASTER_PEER_ID isEqualToString:@""] && self.currentSession)
+            {
+                [self.currentSession connectToPeer:MASTER_PEER_ID withTimeout:0];
+            }
+        }
+        else if(buttonIndex == 1)
+        {
+            //NO
+            
+            //do nothing
+        }
+    }
+    else if(alertView.tag == kALERT_DISCONNECT_CONFIRMATION)
+    {
+        if(buttonIndex == 0)
+        {
+            //YES
+            
+            if(self.currentSession)
+            {
+                [self invalidateSession:self.currentSession];
+                self.currentSession = nil;
+            }
+        }
+    }
+}
+
+#pragma mark - Application logic
+
+- (IBAction)flipBtnPressed:(id)sender
+{   
+    int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    
+    int CARD_COUNT = [self.cardContainerImgView.subviews count];
+    
+    if(IS_CARD_CONTAINER_FACING_FRONT)
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+    }
+    else 
+    {
+        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
     }
     
     
-    UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+    NSMutableArray *tempCurCardTagArray = [NSMutableArray array];
+    NSMutableArray *tempCurCardFrameArray = [NSMutableArray array];
     
-    cardImgView.userInteractionEnabled = YES;
-    cardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
-    cardImgView.frame = CGRectMake(0, 
-                                   -20, 
-                                   cardImage.size.width, 
-                                   cardImage.size.height); 
-
-    cardImgView.tag = cardIdx;//tag the card
-    
-    
-    //=== single tap gesture
-    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
-    
-    singleTapRecognizer.numberOfTouchesRequired = 1;
-    singleTapRecognizer.numberOfTapsRequired = 1;
-    
-    [cardImgView addGestureRecognizer:singleTapRecognizer];
-    
-    [singleTapRecognizer release];
+    for(int i=0; i < CARD_COUNT; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+        [tempCurCardTagArray addObject:[NSNumber numberWithInt:curCardImgView.tag]];
+        [tempCurCardFrameArray addObject:[NSValue valueWithCGRect:curCardImgView.frame]];
+    }
     
     
-    //=== double tap gesture
-    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
-    
-    //double tap
-    doubleTapRecognizer.numberOfTouchesRequired = 1;
-    doubleTapRecognizer.numberOfTapsRequired = 2;
-    
-    [cardImgView addGestureRecognizer:doubleTapRecognizer];
-    
-    [doubleTapRecognizer release];  
-    
-    
-    //add pan gesture recognizer
-    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
-    
-    [cardImgView addGestureRecognizer:panRecognizer]; 
-    
-    [panRecognizer release];    
-    
-    
-    //add to the array
-    [self.cardContainerImgView addSubview:cardImgView]; 
-    
-    cardImgView.center = CGPointMake(self.cardContainerImgView.center.x, 
-                                     self.cardContainerImgView.center.y - 300);
-    
-    
-    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
+    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
+    {
+        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
         
-        cardImgView.center = CGPointMake(self.cardContainerImgView.center.x,
-                                         self.cardContainerImgView.center.y + 65);
+        NSNumber *storedTagNumber = (NSNumber *)[tempCurCardTagArray objectAtIndex:(CARD_COUNT - 1) - i];
+        int storedCardTag = [storedTagNumber intValue];
         
-    } completion:^(BOOL finished) {
+        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:storedCardTag];
+        curCardImgView.tag = storedCardTag;
         
-        
-        if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+        if(theCard.isFacingUp)
         {
-            [self swipeOpenCardsWithDirection:0];
+            curCardImgView.image = self.backsideImage;
+            theCard.isFacingUp = FALSE;
         }
-        else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+        else
         {
-            [self swipeOpenCardsWithDirection:1];
-        }   
-        
-    }];
+            curCardImgView.image = theCard.cardImage;
+            theCard.isFacingUp = TRUE;
+        }
+    }   
     
     
-    [cardImgView release];
-    
-    [self updateNumOfCards];
+    [UIView transitionWithView:self.cardContainerImgView
+                      duration:0.8
+                       options:animationOptionIdx
+                    animations:^{ 
+                        
+                    }
+     
+                    completion:^(BOOL finished) {
+                        
+                        if(IS_CARD_CONTAINER_FACING_FRONT)
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
+                            
+                        }
+                        else
+                        {
+                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
+                        }   
+                        
+                    }];  
     
 }
 
+- (IBAction)connectDisconnectBtnPressed:(id)sender
+{
+    /*
+     //disconnect bluetooth
+     [self.currentSession disconnectFromAllPeers];
+     [self.currentSession release];
+     currentSession = nil;
+     
+     GKCardViewController_iPhone *rootVC_iphone = APP_DELEGATE_IPHONE.viewController;
+     [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0 fromDevice:@"iPhone"];
+     */
+    
+    if(! self.currentSession)
+    {
+        [self startBluetooth];
+    }
+    else
+    {
+        NSString *serverName = @"";
+        
+        if(! [MASTER_PEER_ID isEqualToString:@""])
+        {
+            serverName = [self.currentSession displayNameForPeer:MASTER_PEER_ID];
+        }
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Disconnect Confirmation" message:[NSString stringWithFormat:@"Do you want to disconnect from the server %@ ?", serverName] delegate:self cancelButtonTitle:@"YES" otherButtonTitles:@"NO", nil];
+        alert.tag = kALERT_DISCONNECT_CONFIRMATION;
+        [alert show];
+        [alert release];        
+    }
+}
 
-#pragma mark - App logic
+- (IBAction)testBtnPressed:(id)sender
+{
+    int cardIdx = arc4random() % 52;
+    
+    NSLog(@"rand cardIdx:%d", cardIdx);
+    
+    [self processReceivedCardWithCardIdx:cardIdx andCardFacing:TRUE];
+    
+    if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+    {
+        [self swipeOpenCardsWithDirection:0];
+    }
+    else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+    {
+        [self swipeOpenCardsWithDirection:1];
+    }
+}
+
+#pragma mark - private method implementation
+
+- (void)invalidateSession:(GKSession *)session {
+    
+	if(session != nil) {
+        
+        [session disconnectFromAllPeers]; 
+		session.available = NO; 
+		[session setDataReceiveHandler: nil withContext: NULL]; 
+		session.delegate = nil; 
+	}
+}
 
 - (void)startBluetooth
 {
-    picker = [[GKPeerPickerController alloc] init];
-    picker.delegate = self;
-    picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
+    /*
+     picker = [[GKPeerPickerController alloc] init];
+     picker.delegate = self;
+     picker.connectionTypesMask = GKPeerPickerConnectionTypeNearby;
+     
+     [picker show];
+     */
     
-    [picker show];
+    if(! self.currentSession)
+    {
+         NSString *deviceName = [[UIDevice currentDevice] name];
+        
+        GKSession *tempSession = [[GKSession alloc] initWithSessionID:kSessionID displayName:deviceName sessionMode:GKSessionModeClient];
+        
+        self.currentSession = tempSession;
+        self.currentSession.delegate = self;
+        self.currentSession.available = YES;
+        self.currentSession.disconnectTimeout = 0;
+        [self.currentSession setDataReceiveHandler:self withContext:nil];
+        
+        [tempSession release];   
+        
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Session started" message:@"Client Session started !" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        
+        [alert show];
+        [alert release];   
+    }
+    else
+    {
+        UIAlertView *alert = [[UIAlertView alloc] initWithTitle:@"Session running" message:[NSString stringWithFormat:@"Server session id %@ and sessionName %@ is running", self.currentSession.sessionID, self.currentSession.displayName] delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil, nil];
+        
+        [alert show];
+        [alert release];        
+    }
+}
+
+- (void)printOutDescriptionAndSolutionOfError:(NSError *)error
+{
+    NSLog(@"================");
+    
+    NSLog(@"description: %@", error.localizedDescription);
+    NSLog(@"failure reason: %@", error.localizedFailureReason);
+    
+    NSLog(@"recovery options:");
+    
+    for(int i=0; i < error.localizedRecoveryOptions.count; i++)
+    {
+        NSLog(@"- %@", [error.localizedRecoveryOptions objectAtIndex:i]);
+    }
+    
+    NSLog(@"recovery suggestion: %@", error.localizedRecoverySuggestion);
+    
+    NSLog(@"================");
 }
 
 - (void)sendCardToIPadWithIndex:(int)cardIdx 
@@ -618,7 +841,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     if(self.currentSession)
     {          
         Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
-   
+        
         NSString *cardIdxStr = [NSString stringWithFormat:@"%d", cardIdx];
         NSString *cardUpStr = [NSString stringWithFormat:@"%d", theCard.isFacingUp];
         
@@ -626,10 +849,10 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
                                   @"CARD", @"TYPE",
                                   cardIdxStr, @"cardIndex",
                                   cardUpStr, @"cardFacing", nil];   
-         
+        
         NSError *error;
         NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
-
+        
         
         if (! jsonString)
         {
@@ -640,7 +863,9 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
             NSLog(@"json string to send out: %@", jsonString);
             
             NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-            NSArray *ipadTableArray = (NSArray *)self.peerIdMutArray;
+            
+            //make sure only send to the first one (and only one - the master)
+            NSArray *ipadTableArray = [NSArray arrayWithObject:[self.peerIdMutArray objectAtIndex:0]];
             
             [self.currentSession sendData:data toPeers:ipadTableArray withDataMode:GKSendDataReliable error:nil];
         }
@@ -751,179 +976,100 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     self.numCardsLabel.text = [NSString stringWithFormat:@"%d", [self.cardContainerImgView.subviews count]];
 }
 
-- (IBAction)flipBtnPressed:(id)sender
-{   
-    int animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
+- (void)processReceivedCardWithCardIdx:(int)cardIdx andCardFacing:(BOOL)cardFacing
+{
+    Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:cardIdx];
+    theCard.isFacingUp = cardFacing;
+    UIImage *cardImage = theCard.cardImage;
     
-    int CARD_COUNT = [self.cardContainerImgView.subviews count];
-    
-    /*
-    if(IS_CARD_CONTAINER_FACING_FRONT)
+    if(! cardFacing)
     {
-        //flip card index
-        for(int i=0; i < CARD_COUNT; i++)
-        {
-            UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            imgView.tag = (CARD_COUNT - 1) - i;
-        }      
-        
-        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
-    }
-    else 
-    {
-        //flip card index
-        for(int i=0; i < CARD_COUNT; i++)
-        {
-            UIImageView *imgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-            imgView.tag = i;
-        }       
-        
-        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
+        cardImage = self.backsideImage;
     }
     
     
-    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
-    {
-        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
+    UIImageView *cardImgView = [[UIImageView alloc] initWithImage:cardImage];
+    
+    cardImgView.userInteractionEnabled = YES;
+    cardImgView.layer.anchorPoint = CGPointMake(0.5, 1.0);
+    cardImgView.frame = CGRectMake(0, 
+                                   -20, 
+                                   cardImage.size.width, 
+                                   cardImage.size.height); 
+    
+    cardImgView.tag = cardIdx;//tag the card
+    
+    
+    //=== single tap gesture
+    UITapGestureRecognizer *singleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(singleTapGestureHandler:)];
+    
+    singleTapRecognizer.numberOfTouchesRequired = 1;
+    singleTapRecognizer.numberOfTapsRequired = 1;
+    
+    [cardImgView addGestureRecognizer:singleTapRecognizer];
+    
+    [singleTapRecognizer release];
+    
+    
+    //=== double tap gesture
+    UITapGestureRecognizer *doubleTapRecognizer = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(doubleTapGestureHandler:)];
+    
+    //double tap
+    doubleTapRecognizer.numberOfTouchesRequired = 1;
+    doubleTapRecognizer.numberOfTapsRequired = 2;
+    
+    [cardImgView addGestureRecognizer:doubleTapRecognizer];
+    
+    [doubleTapRecognizer release];  
+    
+    
+    //add pan gesture recognizer
+    UIPanGestureRecognizer *panRecognizer = [[UIPanGestureRecognizer alloc] initWithTarget:self action:@selector(panGestureHandler:)];
+    
+    [cardImgView addGestureRecognizer:panRecognizer]; 
+    
+    [panRecognizer release];    
+    
+    
+    //add to the array
+    [self.cardContainerImgView addSubview:cardImgView]; 
+    
+    cardImgView.center = CGPointMake(self.cardContainerImgView.center.x, 
+                                     self.cardContainerImgView.center.y - 300);
+    
+    
+    [UIView animateWithDuration:0.5 delay:0.0 options:UIViewAnimationCurveLinear animations:^(void) {
         
-        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:curCardImgView.tag];
+        cardImgView.center = CGPointMake(self.cardContainerImgView.center.x,
+                                         self.cardContainerImgView.center.y + 65);
         
-        if(theCard.isFacingUp)
+    } completion:^(BOOL finished) {
+        
+        
+        if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
         {
-            curCardImgView.image = self.backsideImage;
-            theCard.isFacingUp = FALSE;
+            //swipe open right by default
+            [self swipeOpenCardsWithDirection:1];
         }
         else
         {
-            curCardImgView.image = theCard.cardImage;
-            theCard.isFacingUp = TRUE;
+            if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
+            {
+                [self swipeOpenCardsWithDirection:0];
+            }
+            else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
+            {
+                [self swipeOpenCardsWithDirection:1];
+            }   
         }
-    }   
-    
-    
-    [UIView transitionWithView:self.cardContainerImgView
-                      duration:0.8
-                       options:animationOptionIdx
-                    animations:^{ 
-                        
-                    }
-     
-                    completion:^(BOOL finished) {
-                        
-                        if(IS_CARD_CONTAINER_FACING_FRONT)
-                        {
-                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
-                            
-                        }
-                        else
-                        {
-                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
-                        }   
-                        
-                    }];
-     
-     */
-    
-    
-    if(IS_CARD_CONTAINER_FACING_FRONT)
-    {
-        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromRight;
-    }
-    else 
-    {
-        animationOptionIdx = UIViewAnimationOptionTransitionFlipFromLeft;
-    }
-    
-    
-    NSMutableArray *tempCurCardTagArray = [NSMutableArray array];
-    NSMutableArray *tempCurCardFrameArray = [NSMutableArray array];
-
-    for(int i=0; i < CARD_COUNT; i++)
-    {
-        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
-        [tempCurCardTagArray addObject:[NSNumber numberWithInt:curCardImgView.tag]];
-        [tempCurCardFrameArray addObject:[NSValue valueWithCGRect:curCardImgView.frame]];
-    }
-    
-    
-    for(int i=0; i < [self.cardContainerImgView.subviews count]; i++)
-    {
-        UIImageView *curCardImgView = (UIImageView *)[self.cardContainerImgView.subviews objectAtIndex:i];
         
-        NSNumber *storedTagNumber = (NSNumber *)[tempCurCardTagArray objectAtIndex:(CARD_COUNT - 1) - i];
-        int storedCardTag = [storedTagNumber intValue];
-        
-        Card *theCard = (Card *)[self.cardObjectMutArray objectAtIndex:storedCardTag];
-        curCardImgView.tag = storedCardTag;
-        
-        if(theCard.isFacingUp)
-        {
-            curCardImgView.image = self.backsideImage;
-            theCard.isFacingUp = FALSE;
-        }
-        else
-        {
-            curCardImgView.image = theCard.cardImage;
-            theCard.isFacingUp = TRUE;
-        }
-    }   
+    }];
     
     
-    [UIView transitionWithView:self.cardContainerImgView
-                      duration:0.8
-                       options:animationOptionIdx
-                    animations:^{ 
-                        
-                    }
-     
-                    completion:^(BOOL finished) {
-                        
-                        if(IS_CARD_CONTAINER_FACING_FRONT)
-                        {
-                            IS_CARD_CONTAINER_FACING_FRONT = FALSE;
-                            
-                        }
-                        else
-                        {
-                            IS_CARD_CONTAINER_FACING_FRONT = TRUE;
-                        }   
-                        
-                    }];  
-     
-}
-
-- (IBAction)disconnectBtnPressed:(id)sender
-{
-    /*
-    //disconnect bluetooth
-    [self.currentSession disconnectFromAllPeers];
-    [self.currentSession release];
-    currentSession = nil;
+    [cardImgView release];
     
-    GKCardViewController_iPhone *rootVC_iphone = APP_DELEGATE_IPHONE.viewController;
-    [APP_DELEGATE_IPHONE transitionFromView:self.view toView:rootVC_iphone.view withDirection:0 fromDevice:@"iPhone"];
-     */
+    [self updateNumOfCards];
     
-    [self startBluetooth];
-}
-
-- (IBAction)testBtnPressed:(id)sender
-{
-    int cardIdx = arc4random() % 52;
-    
-    
-    NSLog(@"rand cardIdx:%d", cardIdx);
-    
-    [self processReceivedCardWithCardIdx:cardIdx andCardFacing:TRUE];
-    
-    if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_RIGHT)
-    {
-        [self swipeOpenCardsWithDirection:0];
-    }
-    else if(CUR_CARD_STACK_STATUS == CARD_EXPANDED_LEFT)
-    {
-        [self swipeOpenCardsWithDirection:1];
-    }
 }
 
 @end

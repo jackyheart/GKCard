@@ -33,6 +33,7 @@
     //bluetooth
     @private GKSession *currentSession;
     @private GKPeerPickerController *picker;
+    @private NSString *MASTER_PEER_ID;
     
     //JSON
     @private SBJSON *sbJSON;
@@ -51,9 +52,8 @@
 @property (nonatomic, retain) GKSession *currentSession;
 @property (nonatomic, retain) SBJSON *sbJSON;
 
-- (void)startBluetooth;
 - (IBAction)flipBtnPressed:(id)sender;
-- (IBAction)disconnectBtnPressed:(id)sender;
+- (IBAction)connectDisconnectBtnPressed:(id)sender;
 - (IBAction)testBtnPressed:(id)sender;
 
 @end
