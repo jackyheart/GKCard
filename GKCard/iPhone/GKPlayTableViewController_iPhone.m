@@ -304,7 +304,6 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
     
     //recognizer.view.transform = CGAffineTransformMakeTranslation(translation.x, translation.y);
 
-    
     [self isOnBluetoothArrow:touchPoint];
     
     if(recognizer.state == UIGestureRecognizerStateEnded)
@@ -404,75 +403,6 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 }
 
 #pragma mark - Bluetooth delegates
-
-/*
-- (void)peerPickerController:(GKPeerPickerController *)pk didConnectPeer:(NSString *)peerID toSession:(GKSession *)session
-{
-    self.currentSession = session;
-    self.currentSession.delegate = self;
-    [self.currentSession setDataReceiveHandler:self withContext:nil];
-    
-    //add peerID to the mut array
-    [self.peerIdMutArray addObject:peerID];    
-    
-    NSLog(@"[in iPhone] peer connected, my session mode: %d, session id:%@, session name:%@", session.sessionMode, session.sessionID, session.displayName);
-    
-    NSLog(@"[in iPhone], newly connected peer id:%@, name:%@", peerID, [session displayNameForPeer:peerID]);
-    
-    
-    NSLog(@"[in iPhone] peer count: %d", [self.peerIdMutArray count]);
-    
-    NSLog(@"[in iPhone] list of peers:");
-    
-    for(int i=0; i < [self.peerIdMutArray count]; i++)
-    {
-        NSString *str = [self.peerIdMutArray objectAtIndex:i];
-        NSLog(@"[in iPhone] peer %d: %@", i, str);
-    }    
-    
-    if(self.currentSession)
-    {                  
-        NSDictionary *dataDict = [NSDictionary dictionaryWithObjectsAndKeys:
-                                  @"FIRST_CONNECTED", @"TYPE",
-                                  @"MASTER", @"ROLE",
-                                  session.sessionID, @"peerID", nil];   
-        
-        NSError *error;
-        NSString *jsonString = [self.sbJSON stringWithObject:dataDict error:&error];
-        
-        
-        if (! jsonString)
-        {
-            NSLog(@"JSON creation failed: %@", [error localizedDescription]);
-        }
-        else
-        {
-            NSLog(@"json string to send out: %@", jsonString);
-            
-            NSData *data = [jsonString dataUsingEncoding:NSUTF8StringEncoding];
-            NSArray *iphoneTableArray = [NSArray arrayWithObject:peerID];//send the first data back to the newly connected peer
-            
-    
-            [self.currentSession sendData:data toPeers:iphoneTableArray withDataMode:GKSendDataReliable error:nil];
-        }     
-    }
-    else
-    {
-        NSLog(@"current BT session not available");
-    }     
-    
-    
-    picker.delegate = nil;
-    [picker dismiss];
-    [picker autorelease];
-}
-
-- (void)peerPickerControllerDidCancel:(GKPeerPickerController *)pk
-{
-    picker.delegate = nil;
-    [picker autorelease];
-}
- */
 
 - (void)session:(GKSession *)session peer:(NSString *)peerID didChangeState:(GKPeerConnectionState)state
 {
@@ -821,6 +751,7 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 {
     NSLog(@"================");
     
+    NSLog(@"error code: %d", error.code);
     NSLog(@"description: %@", error.localizedDescription);
     NSLog(@"failure reason: %@", error.localizedFailureReason);
     

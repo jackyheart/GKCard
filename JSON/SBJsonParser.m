@@ -157,7 +157,7 @@ static char ctrl[0x22];
             break;
     }
     
-    NSAssert(0, NSLocalizedString(@"Should never get here",@""));
+    //NSAssert(0, NSLocalizedString(@"Should never get here",@""));
     return NO;
 }
 
