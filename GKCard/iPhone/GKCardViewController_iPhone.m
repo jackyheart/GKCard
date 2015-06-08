@@ -65,6 +65,12 @@ GKCardAppDelegate *APP_DELEGATE;
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    //return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationLandscapeLeft;
 }
 
 #pragma mark - Application logic

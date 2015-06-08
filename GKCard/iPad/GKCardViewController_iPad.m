@@ -50,9 +50,10 @@ GKCardAppDelegate *APP_DELEGATE;
     //=== get app delegate
     APP_DELEGATE = [[UIApplication sharedApplication] delegate];   
     
-    
     //=== initialize view controllers
     self.gkTableIpadVC = [[GKPlayTableViewController_iPad alloc] initWithNibName:@"GKPlayTableViewController_iPad" bundle:nil];
+    
+    NSLog(@"GKCardViewController_iPad view controller");
 }
 
 - (void)viewDidUnload
@@ -62,10 +63,9 @@ GKCardAppDelegate *APP_DELEGATE;
     // e.g. self.myOutlet = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (NSUInteger)supportedInterfaceOrientations
 {
-    // Return YES for supported orientations
-	return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    return UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
 
 #pragma mark - Application logic

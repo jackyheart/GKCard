@@ -310,6 +310,8 @@ float CARD_HEIGHT = 261.0;
      CGPoint p = [val CGPointValue];
      
      */
+    
+    NSLog(@"GKPlayTableViewController_iPad view did load");
 }
 
 - (void)viewDidUnload
@@ -319,10 +321,9 @@ float CARD_HEIGHT = 261.0;
     // e.g. self.myOutlet = nil;
 }
 
-- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+- (NSUInteger)supportedInterfaceOrientations
 {
-    // Return YES for supported orientations
-	return (interfaceOrientation == UIInterfaceOrientationLandscapeRight);
+    return UIInterfaceOrientationMaskLandscapeLeft | UIInterfaceOrientationMaskPortrait | UIInterfaceOrientationMaskLandscapeRight | UIInterfaceOrientationMaskPortraitUpsideDown;
 }
 
 #pragma mark - Gesture handers
@@ -461,25 +462,28 @@ CGRect cardStartFrame;
 
 - (void)panGestureFullStackHandler:(UIPanGestureRecognizer *)recognizer
 {
-    if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
+    if(recognizer.state == UIGestureRecognizerStateBegan)
     {
-        CGPoint touchPoint = [recognizer locationInView:self.view];    
-        //CGPoint translation = [recognizer translationInView:self.view];   
-        
-        [UIView animateWithDuration:0.5 delay:0.0 
-                            options:UIViewAnimationCurveEaseInOut |   
-                                    UIViewAnimationOptionAllowUserInteraction 
-                         animations:^(void) {
+        if(CUR_CARD_STACK_STATUS == CARD_FULLY_STACKED)
+        {
+            CGPoint touchPoint = [recognizer locationInView:self.view];    
+            //CGPoint translation = [recognizer translationInView:self.view];   
             
-                             for(UIView *v in self.cardContainerImgView.subviews)
-                             {
-                                 v.center = touchPoint;
-                             }             
+            [UIView animateWithDuration:0.5 delay:0.0 
+                                options:UIViewAnimationCurveEaseInOut |   
+                                        UIViewAnimationOptionAllowUserInteraction 
+                             animations:^(void) {
+                
+                                 for(UIView *v in self.cardContainerImgView.subviews)
+                                 {
+                                     v.center = touchPoint;
+                                 }             
+                
+            } completion:^(BOOL finished) {
+                
+            }];
             
-        } completion:^(BOOL finished) {
-            
-        }];
-        
+        }
     }
 }
 

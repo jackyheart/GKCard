@@ -244,6 +244,12 @@ GKCardAppDelegate_iPhone *APP_DELEGATE_IPHONE;
 {
     // Return YES for supported orientations
     return (interfaceOrientation == UIInterfaceOrientationPortrait);
+    //return YES;
+}
+
+- (NSUInteger)supportedInterfaceOrientations
+{
+    return UIInterfaceOrientationLandscapeLeft;
 }
 
 #pragma mark - Gesture handers
